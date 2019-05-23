@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Entity versions module.
+ */
+
+declare(strict_types = 1);
