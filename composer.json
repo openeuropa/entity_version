@@ -41,12 +41,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Drupal\\drupal_module_template\\": "./src/"
+            "Drupal\\entity_versions\\": "./src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Drupal\\Tests\\drupal_module_template\\": "./tests/"
+            "Drupal\\Tests\\entity_versions\\": "./tests/"
         }
     },
     "extra": {

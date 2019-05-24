@@ -1,12 +1,12 @@
 workspace:
   base: /test
-  path: drupal_module_template
+  path: entity_versions
 
 services:
   web:
     image: fpfis/httpd-php-ci:7.1
     environment:
-      - DOCUMENT_ROOT=/test/drupal_module_template
+      - DOCUMENT_ROOT=/test/entity_versions
   mysql:
     image: percona/percona-server:5.6
     environment:
