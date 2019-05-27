@@ -13,7 +13,6 @@
         "composer/installers": "~1.5",
         "drupal-composer/drupal-scaffold": "~2.2",
         "drupal/config_devel": "~1.2",
-        "drupal/console": "^1.6",
         "drupal/drupal-extension": "~4.0",
         "drupal/examples": "1.x-dev",
         "drush/drush": "~9.0@stable",
