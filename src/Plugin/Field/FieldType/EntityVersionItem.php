@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   description = @Translation("Stores the version of the entity.")
  * )
  */
-class EntityVersionItem extends FieldItemBase {
+class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterface {
 
   /**
    * {@inheritdoc}
@@ -48,7 +48,7 @@ class EntityVersionItem extends FieldItemBase {
     $minor = $this->get('minor')->getValue();
     $patch = $this->get('patch')->getValue();
 
-    return empty($major) || empty($minor) || empty($patch);
+    return $major === NULL || $major === '' || $minor === NULL || $minor === '' || $patch === NULL || $patch === '';
   }
 
   /**
@@ -66,9 +66,7 @@ class EntityVersionItem extends FieldItemBase {
   }
 
   /**
-   * Increase the given version number category.
-   *
-   * @param string $category
+   * {@inheritdoc}
    */
   public function increase(string $category): void {
     $value = $this->get($category)->getValue();
@@ -76,19 +74,15 @@ class EntityVersionItem extends FieldItemBase {
   }
 
   /**
-   * Decrease the given version number category.
-   *
-   * @param string $category
+   * {@inheritdoc}
    */
   public function decrease(string $category): void {
     $value = $this->get($category)->getValue();
-    $this->set($category, ($value - 1));
+    $this->set($category, empty($value) ? 0 : ($value - 1));
   }
 
   /**
-   * Reset the given version number category to zero.
-   *
-   * @param string $category
+   * {@inheritdoc}
    */
   public function reset(string $category): void {
     $this->set($category, 0);
