@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   description = @Translation("Stores the versions of the entity.")
  * )
  */
-class EntityVersion extends FieldItemBase {
+class EntityVersionItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
@@ -43,7 +43,12 @@ class EntityVersion extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
+    // We consider the field empty if either of these properties left empty.
+    $major = $this->get('major')->getValue();
+    $minor = $this->get('minor')->getValue();
+    $patch = $this->get('patch')->getValue();
 
+    return empty($major) || empty($minor) || empty($patch);
   }
 
   /**
@@ -65,8 +70,9 @@ class EntityVersion extends FieldItemBase {
    *
    * @param string $category
    */
-  public function increase(string $category): void {
-    //$value = $this->get('value')->getValue();
+  public function increaseValue(string $category): void {
+    $value = $this->get($category)->getValue();
+    $this->set($category, ($value + 1));
   }
 
   /**
@@ -74,8 +80,9 @@ class EntityVersion extends FieldItemBase {
    *
    * @param string $category
    */
-  public function decrease(string $category): void {
-
+  public function decreaseValue(string $category): void {
+    $value = $this->get($category)->getValue();
+    $this->set($category, ($value + 1));
   }
 
   /**
@@ -83,8 +90,8 @@ class EntityVersion extends FieldItemBase {
    *
    * @param string $category
    */
-  public function reset(string $category): void {
-
+  public function resetValue(string $category): void {
+    $this->set($category, 0);
   }
 
 }
