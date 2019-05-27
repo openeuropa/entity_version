@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "entity_version",
  *   label = @Translation("Entity version"),
  *   module = "entity_versions",
- *   description = @Translation("Stores the versions of the entity.")
+ *   description = @Translation("Stores the version of the entity.")
  * )
  */
 class EntityVersionItem extends FieldItemBase {
@@ -70,7 +70,7 @@ class EntityVersionItem extends FieldItemBase {
    *
    * @param string $category
    */
-  public function increaseValue(string $category): void {
+  public function increase(string $category): void {
     $value = $this->get($category)->getValue();
     $this->set($category, ($value + 1));
   }
@@ -80,9 +80,9 @@ class EntityVersionItem extends FieldItemBase {
    *
    * @param string $category
    */
-  public function decreaseValue(string $category): void {
+  public function decrease(string $category): void {
     $value = $this->get($category)->getValue();
-    $this->set($category, ($value + 1));
+    $this->set($category, ($value - 1));
   }
 
   /**
@@ -90,7 +90,7 @@ class EntityVersionItem extends FieldItemBase {
    *
    * @param string $category
    */
-  public function resetValue(string $category): void {
+  public function reset(string $category): void {
     $this->set($category, 0);
   }
 
