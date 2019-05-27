@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_versions\Plugin\Field\FieldType;
+namespace Drupal\entity_version\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemInterface;
 

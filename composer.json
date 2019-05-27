@@ -1,5 +1,5 @@
 {
-    "name": "openeuropa/entity_versions",
+    "name": "openeuropa/entity_version",
     "description": "Entity Versions.",
     "type": "drupal-module",
     "license": "EUPL-1.2",
@@ -33,12 +33,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Drupal\\entity_versions\\": "./src/"
+            "Drupal\\entity_version\\": "./src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Drupal\\Tests\\entity_versions\\": "./tests/"
+            "Drupal\\Tests\\entity_version\\": "./tests/"
         }
     },
     "extra": {

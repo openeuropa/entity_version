@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\entity_versions\Kernel;
+namespace Drupal\Tests\entity_version\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -17,7 +17,7 @@ class EntityVersionItemTest extends FieldKernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['entity_versions'];
+  public static $modules = ['entity_version'];
 
   /**
    * {@inheritdoc}
