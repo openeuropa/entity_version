@@ -15,7 +15,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "entity_version",
  *   label = @Translation("Entity version"),
  *   module = "entity_version",
- *   description = @Translation("Stores the version of the entity.")
+ *   description = @Translation("Stores the version of the entity."),
+ *   default_formatter = "entity_version_formatter"
  * )
  */
 class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterface {
@@ -63,6 +64,24 @@ class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterf
       ->setLabel(t('Patch number'));
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    parent::applyDefaultValue($notify);
+    // Created fields default to zero.
+    $this->setValue(
+      [
+        'major' => 0,
+        'minor' => 0,
+        'patch' => 0,
+      ],
+      $notify
+    );
+
+    return $this;
   }
 
   /**
