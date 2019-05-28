@@ -89,12 +89,26 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $entity = EntityTest::create();
     $entity->save();
 
-    // Verify the untranslated separator.
+    // Verify the version number format.
     $display = EntityViewDisplay::collectRenderDisplay($entity, 'default');
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
-    $this->assertContains('0.0.0', (string) $output);
+    $this->assertContains('<div>0.0.0</div>', (string) $output);
+
+    // Change the minimum version number category to minor.
+    $display->set('content.version.settings.minimum_category', 'minor')->save();
+    $build = $display->build($entity);
+    $output = $this->container->get('renderer')->renderRoot($build);
+    $this->verbose($output);
+    $this->assertContains('<div>0.0</div>', (string) $output);
+
+    // Change the minimum version number category to major.
+    $display->set('content.version.settings.minimum_category', 'minor')->save();
+    $build = $display->build($entity);
+    $output = $this->container->get('renderer')->renderRoot($build);
+    $this->verbose($output);
+    $this->assertContains('<div>0</div>', (string) $output);
   }
 
 }

@@ -95,7 +95,7 @@ class EntityVersionFormatter extends FormatterBase {
     }
 
     return [
-      '#plain_text' => $text_value,
+      '#markup' => $text_value,
     ];
   }
 

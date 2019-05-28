@@ -9,17 +9,17 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'default_entity_version_widget' widget.
+ * Plugin implementation of the 'entity_version_widget' widget.
  *
  * @FieldWidget(
- *   id = "default_entity_version_widget",
- *   label = @Translation("Default entity version widget"),
+ *   id = "entity_version_widget",
+ *   label = @Translation("Entity version widget"),
  *   field_types = {
  *     "entity_version"
  *   }
  * )
  */
-class DefaultEntityVersionWidget extends WidgetBase {
+class EntityVersionWidget extends WidgetBase {
 
   /**
    * {@inheritdoc}
