@@ -6,6 +6,7 @@ namespace Drupal\entity_version\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
+use Drupal\Core\Field\WidgetInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -19,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class EntityVersionWidget extends WidgetBase {
+class EntityVersionWidget extends WidgetBase implements WidgetInterface {
 
   /**
    * {@inheritdoc}
@@ -58,6 +59,21 @@ class EntityVersionWidget extends WidgetBase {
     ];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+
+    foreach ($values as &$item) {
+      $version = $item['version'];
+      $item['major'] = $version['major'];
+      $item['minor'] = $version['minor'];
+      $item['patch'] = $version['patch'];
+    }
+
+    return $values;
   }
 
 }
