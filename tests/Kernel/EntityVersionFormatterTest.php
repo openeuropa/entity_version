@@ -28,6 +28,19 @@ class EntityVersionFormatterTest extends KernelTestBase {
   protected $field;
 
   /**
+   * The display options to use in the formatter.
+   *
+   * @var array
+   */
+  protected $displayOptions = [
+    'type' => 'entity_version_formatter',
+    'label' => 'hidden',
+    'settings' => [
+      'minimum_category' => 'patch',
+    ],
+  ];
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = [
@@ -65,19 +78,12 @@ class EntityVersionFormatterTest extends KernelTestBase {
     ]);
     $this->field->save();
 
-    $display_options = [
-      'type' => 'entity_version_formatter',
-      'label' => 'hidden',
-      'settings' => [
-        'minimum_category' => 'patch',
-      ],
-    ];
     EntityViewDisplay::create([
       'targetEntityType' => $this->field->getTargetEntityTypeId(),
       'bundle' => $this->field->getTargetBundle(),
       'mode' => 'default',
       'status' => TRUE,
-    ])->setComponent($this->fieldStorage->getName(), $display_options)
+    ])->setComponent($this->fieldStorage->getName(), $this->displayOptions)
       ->save();
   }
 
@@ -97,14 +103,17 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $this->assertContains('<div>0.0.0</div>', (string) $output);
 
     // Change the minimum version number category to minor.
-    $display->set('content.version.settings.minimum_category', 'minor')->save();
+    $this->displayOptions['settings']['minimum_category'] = 'minor';
+    $display->setComponent('version', $this->displayOptions)->save();
+
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
     $this->assertContains('<div>0.0</div>', (string) $output);
 
     // Change the minimum version number category to major.
-    $display->set('content.version.settings.minimum_category', 'minor')->save();
+    $this->displayOptions['settings']['minimum_category'] = 'major';
+    $display->setComponent('version', $this->displayOptions)->save();
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
