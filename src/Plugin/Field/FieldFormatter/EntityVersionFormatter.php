@@ -2,17 +2,10 @@
 
 namespace Drupal\entity_version\Plugin\Field\FieldFormatter;
 
-use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Path\PathValidatorInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
-use Drupal\link\LinkItemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'entity_version' formatter.
@@ -41,17 +34,17 @@ class EntityVersionFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     return [
-        'minimum_category' => [
-          '#type' => 'select',
-          '#title' => $this->t('Minimum version'),
-          '#description' => $this->t('The minimum version number category to show.'),
-          '#default_value' => $this->getSetting('minimum_category'),
-          '#options' => [
-            'major' => 'Major',
-            'minor' => 'Minor',
-            'patch' => 'Patch',
-          ]
+      'minimum_category' => [
+        '#type' => 'select',
+        '#title' => $this->t('Minimum version'),
+        '#description' => $this->t('The minimum version number category to show.'),
+        '#default_value' => $this->getSetting('minimum_category'),
+        '#options' => [
+          'major' => 'Major',
+          'minor' => 'Minor',
+          'patch' => 'Patch',
         ],
+      ],
     ] + parent::settingsForm($form, $form_state);
   }
 
@@ -70,7 +63,7 @@ class EntityVersionFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
 
-    foreach($items as $delta => $item) {
+    foreach ($items as $delta => $item) {
       $elements[$delta] = $this->viewValue($item);
     }
 
@@ -84,24 +77,25 @@ class EntityVersionFormatter extends FormatterBase {
    *   One field item.
    *
    * @return array
+   *   The render array.
    */
   protected function viewValue(FieldItemInterface $item) {
     $categories = ['major', 'minor', 'patch'];
     $minimum_category = $this->getSetting('minimum_category');
-    $markup = [];
+    $text_value = [];
 
     foreach ($categories as $category) {
       $value = $item->get($category)->getValue();
 
-      $markup[] = $value;
+      $text_value[] = $value;
       if ($category === $minimum_category) {
-        $markup = implode('.', $markup);;
+        $text_value = implode('.', $text_value);;
         break;
       }
     }
 
     return [
-      '#markup' => $markup,
+      '#plain_text' => $text_value,
     ];
   }
 

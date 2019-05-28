@@ -7,7 +7,6 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
  * Tests the new formatter created for entity version field type.
