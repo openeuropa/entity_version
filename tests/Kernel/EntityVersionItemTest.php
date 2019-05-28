@@ -44,17 +44,14 @@ class EntityVersionItemTest extends FieldKernelTestBase {
   public function testEntityVersionItem() {
     // Create entity.
     $entity = EntityTest::create();
-    $entity->version->major = 1;
-    $entity->version->minor = 1;
-    $entity->version->patch = 1;
     $entity->save();
 
-    // Verify that the field value is changed.
+    // Verify that the field default value is zero.
     $id = $entity->id();
     $entity = EntityTest::load($id);
-    $this->assertEqual($entity->version->major, 1);
-    $this->assertEqual($entity->version->minor, 1);
-    $this->assertEqual($entity->version->patch, 1);
+    $this->assertEqual($entity->version->major, 0);
+    $this->assertEqual($entity->version->minor, 0);
+    $this->assertEqual($entity->version->patch, 0);
 
     // Use the field type method to increase the values.
     $entity->version->first()->increase('major');
@@ -65,9 +62,9 @@ class EntityVersionItemTest extends FieldKernelTestBase {
     // Verify that the field value is changed.
     $id = $entity->id();
     $entity = EntityTest::load($id);
-    $this->assertEqual($entity->version->major, 2);
-    $this->assertEqual($entity->version->minor, 2);
-    $this->assertEqual($entity->version->patch, 2);
+    $this->assertEqual($entity->version->major, 1);
+    $this->assertEqual($entity->version->minor, 1);
+    $this->assertEqual($entity->version->patch, 1);
 
     // Use the field type method to decrease the major number.
     $entity->version->first()->decrease('major');
@@ -76,9 +73,9 @@ class EntityVersionItemTest extends FieldKernelTestBase {
     // Verify that the field value is changed.
     $id = $entity->id();
     $entity = EntityTest::load($id);
-    $this->assertEqual($entity->version->major, 1);
-    $this->assertEqual($entity->version->minor, 2);
-    $this->assertEqual($entity->version->patch, 2);
+    $this->assertEqual($entity->version->major, 0);
+    $this->assertEqual($entity->version->minor, 1);
+    $this->assertEqual($entity->version->patch, 1);
 
     // Use the field type method to decrease values.
     $entity->version->first()->decrease('minor');
@@ -88,9 +85,15 @@ class EntityVersionItemTest extends FieldKernelTestBase {
     // Verify that the field value is changed.
     $id = $entity->id();
     $entity = EntityTest::load($id);
-    $this->assertEqual($entity->version->major, 1);
-    $this->assertEqual($entity->version->minor, 1);
-    $this->assertEqual($entity->version->patch, 1);
+    $this->assertEqual($entity->version->major, 0);
+    $this->assertEqual($entity->version->minor, 0);
+    $this->assertEqual($entity->version->patch, 0);
+
+    // Use the field type method to increase the values.
+    $entity->version->first()->increase('major');
+    $entity->version->first()->increase('minor');
+    $entity->version->first()->increase('patch');
+    $entity->save();
 
     // Use the field type method to reset values to zero.
     $entity->version->first()->reset('major');
@@ -98,7 +101,7 @@ class EntityVersionItemTest extends FieldKernelTestBase {
     $entity->version->first()->reset('patch');
     $entity->save();
 
-    // Verify that the field value is changed.
+    // Verify that the field value is reset.
     $id = $entity->id();
     $entity = EntityTest::load($id);
     $this->assertEqual($entity->version->major, 0);

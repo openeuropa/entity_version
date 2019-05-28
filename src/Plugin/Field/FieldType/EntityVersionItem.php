@@ -68,6 +68,24 @@ class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterf
   /**
    * {@inheritdoc}
    */
+  public function applyDefaultValue($notify = TRUE) {
+    parent::applyDefaultValue($notify);
+    // Created fields default to zero.
+    $this->setValue(
+      [
+        'major' => 0,
+        'minor' => 0,
+        'patch' => 0,
+      ],
+      $notify
+    );
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function increase(string $category): void {
     $value = $this->get($category)->getValue();
     $this->set($category, ($value + 1));
