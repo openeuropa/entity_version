@@ -1,6 +1,6 @@
 # Entity version
 
-Entity version allows to attach version number to content revisions that help content editors to understand and version the evolution of the content item. 
+Entity version allows to attach version number to content revisions that help content editors to understand the evolution of the content item. 
 Versions are composed of major, minor and patch numbers that can be changed manually or by third party modules.
 
 ## Development setup
