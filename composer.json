@@ -1,6 +1,6 @@
 {
-    "name": "openeuropa/entity_versions",
-    "description": "Entity Versions.",
+    "name": "openeuropa/entity_version",
+    "description": "Entity Version.",
     "type": "drupal-module",
     "license": "EUPL-1.2",
     "minimum-stability": "dev",
@@ -13,7 +13,6 @@
         "composer/installers": "~1.5",
         "drupal-composer/drupal-scaffold": "~2.2",
         "drupal/config_devel": "~1.2",
-        "drupal/console": "^1.6",
         "drupal/drupal-extension": "~4.0",
         "drush/drush": "~9.0@stable",
         "openeuropa/code-review": "~1.0.0-beta2",
@@ -34,12 +33,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Drupal\\entity_versions\\": "./src/"
+            "Drupal\\entity_version\\": "./src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Drupal\\Tests\\entity_versions\\": "./tests/"
+            "Drupal\\Tests\\entity_version\\": "./tests/"
         }
     },
     "extra": {

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Entity versions module.
+ * Entity version module.
  */
 
 declare(strict_types = 1);

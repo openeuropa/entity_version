@@ -1,12 +1,12 @@
 workspace:
   base: /test
-  path: entity_versions
+  path: entity_version
 
 services:
   web:
     image: fpfis/httpd-php-ci:7.1
     environment:
-      - DOCUMENT_ROOT=/test/entity_versions
+      - DOCUMENT_ROOT=/test/entity_version
   mysql:
     image: percona/percona-server:5.6
     environment:
