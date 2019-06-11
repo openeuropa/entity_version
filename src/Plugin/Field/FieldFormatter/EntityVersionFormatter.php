@@ -35,7 +35,7 @@ class EntityVersionFormatter extends FormatterBase {
    * @return array
    *   The options available.
    */
-  protected function getVersionOptions() {
+  protected function getVersionOptions(): array {
     return [
       'major' => $this->t('Major'),
       'minor' => $this->t('Minor'),
