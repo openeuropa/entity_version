@@ -16,8 +16,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   label = @Translation("Entity version"),
  *   module = "entity_version",
  *   description = @Translation("Stores the version of the entity."),
- *   default_formatter = "entity_version_formatter",
- *   default_widget = "entity_version_widget"
+ *   default_formatter = "entity_version",
+ *   default_widget = "entity_version"
  * )
  */
 class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterface {

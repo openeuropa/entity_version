@@ -33,7 +33,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
    * @var array
    */
   protected $displayOptions = [
-    'type' => 'entity_version_formatter',
+    'type' => 'entity_version',
     'label' => 'hidden',
     'settings' => [
       'minimum_category' => 'patch',

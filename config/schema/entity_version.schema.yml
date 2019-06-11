@@ -1,6 +1,6 @@
 # Schema for the configuration files of the Entity version module.
 
-field.formatter.settings.entity_version_formatter:
+field.formatter.settings.entity_version:
   type: mapping
   label: 'Entity version formatter settings'
   mapping:

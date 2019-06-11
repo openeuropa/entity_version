@@ -11,7 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Plugin implementation of the 'entity_version' formatter.
  *
  * @FieldFormatter(
- *   id = "entity_version_formatter",
+ *   id = "entity_version",
  *   label = @Translation("Version"),
  *   field_types = {
  *     "entity_version"
@@ -30,6 +30,20 @@ class EntityVersionFormatter extends FormatterBase {
   }
 
   /**
+   * Gets version options available.
+   *
+   * @return array
+   *   The options available.
+   */
+  protected function getVersionOptions() {
+    return [
+      'major' => $this->t('Major'),
+      'minor' => $this->t('Minor'),
+      'patch' => $this->t('Patch'),
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
@@ -39,11 +53,7 @@ class EntityVersionFormatter extends FormatterBase {
         '#title' => $this->t('Minimum version'),
         '#description' => $this->t('The minimum version number category to show.'),
         '#default_value' => $this->getSetting('minimum_category'),
-        '#options' => [
-          'major' => 'Major',
-          'minor' => 'Minor',
-          'patch' => 'Patch',
-        ],
+        '#options' => $this->getVersionOptions(),
       ],
     ] + parent::settingsForm($form, $form_state);
   }
@@ -53,7 +63,9 @@ class EntityVersionFormatter extends FormatterBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = t('Minimum category: @value', ['@value' => $this->getSetting('minimum_category')]);
+    $versionOptions = $this->getVersionOptions();
+    $settingLabel = $versionOptions[$this->getSetting('minimum_category')];
+    $summary[] = $this->t('Minimum category: @valueLabel', ['@valueLabel' => $settingLabel]);
     return parent::settingsSummary();
   }
 
@@ -79,8 +91,8 @@ class EntityVersionFormatter extends FormatterBase {
    * @return array
    *   The render array.
    */
-  protected function viewValue(FieldItemInterface $item) {
-    $categories = ['major', 'minor', 'patch'];
+  protected function viewValue(FieldItemInterface $item): array {
+    $categories = array_keys($this->getVersionOptions());
     $minimum_category = $this->getSetting('minimum_category');
     $text_value = [];
 

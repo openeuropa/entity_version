@@ -10,11 +10,11 @@ use Drupal\Core\Field\WidgetInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'entity_version_widget' widget.
+ * Plugin implementation of the 'entity_version' widget.
  *
  * @FieldWidget(
- *   id = "entity_version_widget",
- *   label = @Translation("Entity version widget"),
+ *   id = "entity_version",
+ *   label = @Translation("Entity version"),
  *   field_types = {
  *     "entity_version"
  *   }
@@ -32,28 +32,25 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
     ] + $element;
 
     $element['version']['major'] = [
-      '#type' => 'textfield',
-      '#title' => t('Major'),
-      '#default_value' => isset($items[$delta]->major) ? $items[$delta]->major : NULL,
-      '#description' => '',
+      '#type' => 'number',
+      '#title' => $this->t('Major'),
+      '#default_value' => $items[$delta]->major ?? NULL,
       '#size' => 5,
       '#required' => FALSE,
     ];
 
     $element['version']['minor'] = [
-      '#type' => 'textfield',
-      '#title' => t('Minor'),
-      '#default_value' => isset($items[$delta]->minor) ? $items[$delta]->minor : NULL,
-      '#description' => '',
+      '#type' => 'number',
+      '#title' => $this->t('Minor'),
+      '#default_value' => $items[$delta]->minor ?? NULL,
       '#size' => 5,
       '#required' => FALSE,
     ];
 
     $element['version']['patch'] = [
-      '#type' => 'textfield',
-      '#title' => t('Patch'),
-      '#default_value' => isset($items[$delta]->patch) ? $items[$delta]->patch : NULL,
-      '#description' => '',
+      '#type' => 'number',
+      '#title' => $this->t('Patch'),
+      '#default_value' => $items[$delta]->patch ?? NULL,
       '#size' => 5,
       '#required' => FALSE,
     ];
@@ -65,7 +62,6 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-
     foreach ($values as &$item) {
       $version = $item['version'];
       $item['major'] = $version['major'];
