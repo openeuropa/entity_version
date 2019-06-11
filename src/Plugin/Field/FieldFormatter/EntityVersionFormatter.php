@@ -63,9 +63,9 @@ class EntityVersionFormatter extends FormatterBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $versionOptions = $this->getVersionOptions();
-    $settingLabel = $versionOptions[$this->getSetting('minimum_category')];
-    $summary[] = $this->t('Minimum category: @valueLabel', ['@valueLabel' => $settingLabel]);
+    $version_options = $this->getVersionOptions();
+    $setting_label = $version_options[$this->getSetting('minimum_category')];
+    $summary[] = $this->t('Minimum category: @valueLabel', ['@valueLabel' => $setting_label]);
     return parent::settingsSummary();
   }
 
