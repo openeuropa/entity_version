@@ -28,7 +28,7 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element['version'] = [
       '#type' => 'details',
-      '#title' => t('Version'),
+      '#title' => $this->t('Version'),
     ] + $element;
 
     $element['version']['major'] = [
