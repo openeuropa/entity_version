@@ -36,6 +36,8 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
       '#title' => $this->t('Major'),
       '#default_value' => $items[$delta]->major ?? NULL,
       '#size' => 5,
+      '#min' => 0,
+      '#step' => 1,
       '#required' => FALSE,
     ];
 
@@ -44,6 +46,8 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
       '#title' => $this->t('Minor'),
       '#default_value' => $items[$delta]->minor ?? NULL,
       '#size' => 5,
+      '#min' => 0,
+      '#step' => 1,
       '#required' => FALSE,
     ];
 
@@ -52,6 +56,8 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
       '#title' => $this->t('Patch'),
       '#default_value' => $items[$delta]->patch ?? NULL,
       '#size' => 5,
+      '#min' => 0,
+      '#step' => 1,
       '#required' => FALSE,
     ];
 

@@ -30,12 +30,15 @@ class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterf
       'columns' => [
         'major' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
         'minor' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
         'patch' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
       ],
     ];
