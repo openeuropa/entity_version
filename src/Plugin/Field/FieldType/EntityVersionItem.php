@@ -15,7 +15,9 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "entity_version",
  *   label = @Translation("Entity version"),
  *   module = "entity_version",
- *   description = @Translation("Stores the version of the entity.")
+ *   description = @Translation("Stores the version of the entity."),
+ *   default_formatter = "entity_version",
+ *   default_widget = "entity_version"
  * )
  */
 class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterface {
@@ -28,12 +30,15 @@ class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterf
       'columns' => [
         'major' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
         'minor' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
         'patch' => [
           'type' => 'int',
+          'unsigned' => TRUE,
         ],
       ],
     ];

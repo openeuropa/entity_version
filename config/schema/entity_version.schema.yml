@@ -1,0 +1,9 @@
+# Schema for the configuration files of the Entity version module.
+
+field.formatter.settings.entity_version:
+  type: mapping
+  label: 'Entity version formatter settings'
+  mapping:
+    minimum_category:
+      type: string
+      label: 'Minimum version'
