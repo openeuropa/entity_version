@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Entity version workflows module.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\workflows\WorkflowInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function entity_version_workflows_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id === 'workflow_transition_edit_form' || $form_id === 'workflow_transition_edit_form') {
+    entity_version_workflows_alter_transition_forms($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Handles the form alter for the workflow_transition_edit_form and workflow_transition_edit_form forms.
+ */
+function entity_version_workflows_alter_transition_forms(&$form, FormStateInterface $form_state, $form_id) {
+  $transition = $form_state->getFormObject()->getEntity();
+
+  $form['version'] = [
+      '#type' => 'details',
+      '#title' => t('Version control'),
+      '#description' => t('Select an action to do with each version number when this transition is being used.'),
+      '#open' => TRUE,
+    ];
+
+  $form['version']['major'] = [
+    '#type' => 'select',
+    '#title' => t('Major'),
+    '#default_value' => $transition->getThirdPartySetting('entity_version_workflows', 'major'),
+    '#options' => [
+      '' => 'None',
+      'increase' => 'Increase',
+      'decrease' => 'Decrease',
+      'reset' => 'Reset',
+    ],
+    '#required' => FALSE,
+  ];
+
+  $form['version']['minor'] = [
+    '#type' => 'select',
+    '#title' => t('Minor'),
+    '#default_value' => $transition->getThirdPartySetting('entity_version_workflows', 'minor'),
+    '#options' => [
+      '' => 'None',
+      'increase' => 'Increase',
+      'decrease' => 'Decrease',
+      'reset' => 'Reset',
+    ],
+    '#required' => FALSE,
+  ];
+
+  $form['version']['patch'] = [
+    '#type' => 'select',
+    '#title' => t('Patch'),
+    '#default_value' => $transition->getThirdPartySetting('entity_version_workflows', 'patch'),
+    '#options' => [
+      '' => 'None',
+      'increase' => 'Increase',
+      'decrease' => 'Decrease',
+      'reset' => 'Reset',
+    ],
+    '#required' => FALSE,
+  ];
+
+  $form['#entity_builders'][] = 'entity_version_workflows_form_transition_add_form_builder';
+}
+
+/**
+ * Entity builder for the transition configuration entity.
+ */
+function entity_version_workflows_form_transition_add_form_builder($entity_type, WorkflowInterface $transition, &$form, FormStateInterface $form_state) {
+  $fields = [
+    'major',
+    'minor',
+    'patch',
+  ];
+
+  foreach ($fields as $field) {
+    if ($form_state->getValue($field)) {
+      $transition->setThirdPartySetting('entity_version_workflows', $field, $form_state->getValue($field));
+    }
+    else {
+      $transition->unsetThirdPartySetting('entity_version_workflows', $field);
+    }
+  }
+}
