@@ -74,7 +74,6 @@ class EntityVersionItem extends FieldItemBase implements EntityVersionItemInterf
    * {@inheritdoc}
    */
   public function applyDefaultValue($notify = TRUE) {
-    parent::applyDefaultValue($notify);
     // Created fields default to zero.
     $this->setValue(
       [

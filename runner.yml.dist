@@ -20,7 +20,6 @@ drupal:
     - "./vendor/bin/drush config-set node.settings use_admin_theme 1 -y"
     # Enable the modules.
     - "./vendor/bin/drush en config_devel -y"
-    - "./vendor/bin/drush en entity_version -y"
     - "./vendor/bin/drush en entity_version_workflows_example -y"
     - "./vendor/bin/drush cr"
   settings:
@@ -36,6 +35,8 @@ commands:
     - { task: "symlink", from: "../../..", to: "${drupal.root}/modules/custom/entity_version" }
     - { task: "run", command: "drupal:drush-setup" }
     - { task: "run", command: "drupal:settings-setup" }
+    # Generate settings.testing.php, it will be used when running functional tests.
+    - { task: "process-php", type: "write", config: "drupal.settings", source: "${drupal.root}/sites/default/default.settings.php", destination: "${drupal.root}/sites/default/settings.testing.php", override: true }
     - { task: "run", command: "setup:phpunit" }
   setup:phpunit:
     - { task: "process", source: "phpunit.xml.dist", destination: "phpunit.xml" }

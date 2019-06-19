@@ -5,4 +5,5 @@ type: module
 core: 8.x
 
 dependencies:
+  - entity_version:entity_version
   - content_moderation:content_moderation
