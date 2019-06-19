@@ -1,0 +1,4 @@
+services:
+  entity_version_workflows.entity_version_workflow_handler:
+    class: Drupal\entity_version_workflows\Services\EntityVersionWorkflowHandler
+    arguments: ['@content_moderation.moderation_information']
