@@ -33,7 +33,9 @@ class EntityVersionWorkflowHandler {
    * Update the entity version field values of an entity.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   * @param $field_name
+   *   The content entity.
+   * @param string $field_name
+   *   The name of the entity version field.
    */
   public function updateEntityVersion(ContentEntityInterface $entity, $field_name): void {
     /** @var \Drupal\workflows\WorkflowInterface $workflow */
@@ -51,7 +53,7 @@ class EntityVersionWorkflowHandler {
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
 
-    if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())){
+    if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {
       foreach ($values as $field => $action) {
         $entity->get($field_name)->first()->$action($field);
       }
