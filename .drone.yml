@@ -51,12 +51,6 @@ pipeline:
     commands:
       - ./vendor/bin/phpunit
 
-  behat:
-    group: test
-    image: fpfis/httpd-php-ci:7.1
-    commands:
-      - ./vendor/bin/behat --strict
-
 matrix:
   COMPOSER_BOUNDARY:
   - lowest
