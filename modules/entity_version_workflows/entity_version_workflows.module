@@ -7,9 +7,9 @@
 
 declare(strict_types = 1);
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
 use Drupal\workflows\WorkflowInterface;
 
 /**
@@ -129,7 +129,8 @@ function _entity_version_workflows_form_transition_add_form_builder($entity_type
  * Implements hook_entity_presave().
  */
 function entity_version_workflows_entity_presave(EntityInterface $entity) {
-  if (!($entity instanceof ContentEntityInterface)) {
+  // Catch the node entity and update the entity version field.
+  if (!($entity instanceof NodeInterface)) {
     return;
   }
 

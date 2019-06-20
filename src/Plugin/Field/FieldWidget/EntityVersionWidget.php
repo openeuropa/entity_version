@@ -70,9 +70,11 @@ class EntityVersionWidget extends WidgetBase implements WidgetInterface {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$item) {
       $version = $item['version'];
-      $item['major'] = $version['major'];
-      $item['minor'] = $version['minor'];
-      $item['patch'] = $version['patch'];
+      $item = [
+        'major' => $version['major'],
+        'minor' => $version['minor'],
+        'patch' => $version['patch'],
+      ];
     }
 
     return $values;

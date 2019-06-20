@@ -8,7 +8,7 @@ use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Handler to control the entity version numbers for workflows.
+ * Handler to control the entity version numbers for when workflows are used.
  */
 class EntityVersionWorkflowHandler {
 
@@ -20,7 +20,7 @@ class EntityVersionWorkflowHandler {
   protected $moderationInfo;
 
   /**
-   * Constructs a new EntityVersionHandler.
+   * Constructs a new EntityVersionWorkflowHandler.
    *
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
    *   The moderation information service.
@@ -30,7 +30,7 @@ class EntityVersionWorkflowHandler {
   }
 
   /**
-   * Update the entity version field values of an entity.
+   * Update the entity version field values of a content entity.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The content entity.
@@ -47,12 +47,11 @@ class EntityVersionWorkflowHandler {
     /** @var \Drupal\workflows\WorkflowTypeInterface $workflow_plugin */
     $workflow_plugin = $workflow->getTypePlugin();
 
+    // Get the transition in place to retrieve the actions from config.
     $current_state = $entity->original->moderation_state->value;
     $next_state = $entity->moderation_state->value;
-
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
-
     if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {
       foreach ($values as $field => $action) {
         $entity->get($field_name)->first()->$action($field);

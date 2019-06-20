@@ -16,13 +16,9 @@ required: false
 translatable: false
 default_value:
   -
-    version:
-      major: '0'
-      minor: '0'
-      patch: '0'
-    major: '0'
-    minor: '0'
-    patch: '0'
+    major: 0
+    minor: 0
+    patch: 0
 default_value_callback: ''
 settings: {  }
 field_type: entity_version
