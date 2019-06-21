@@ -17,8 +17,12 @@
         "openeuropa/code-review": "~1.0.0-beta2",
         "openeuropa/drupal-core-require-dev": "^8.7",
         "openeuropa/task-runner": "~1.0.0-beta5",
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~6.0",
+        "symfony/browser-kit": "~4.3"
     },
+    "_readme": [
+        "symfony/browser-kit is explicitly required to make phpunit tests pass for 'composer update --prefer-lowest'."
+    ],
     "scripts": {
         "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
         "post-install-cmd": "./vendor/bin/run drupal:site-setup",
