@@ -38,23 +38,28 @@ class EntityVersionWorkflowHandler {
    *   The name of the entity version field.
    */
   public function updateEntityVersion(ContentEntityInterface $entity, $field_name): void {
+    if ($entity->isNew()) {
+      return;
+    }
+
     /** @var \Drupal\workflows\WorkflowInterface $workflow */
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
-    if (!$workflow || $entity->isNew()) {
+    if (!$workflow) {
       return;
     }
 
     /** @var \Drupal\workflows\WorkflowTypeInterface $workflow_plugin */
     $workflow_plugin = $workflow->getTypePlugin();
 
-    // Get the transition in place to retrieve the actions from config.
+    // Compute the transition being used in order to get the version actions
+    // from its config.
     $current_state = $entity->original->moderation_state->value;
     $next_state = $entity->moderation_state->value;
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
     if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {
-      foreach ($values as $field => $action) {
-        $entity->get($field_name)->first()->$action($field);
+      foreach ($values as $version => $action) {
+        $entity->get($field_name)->first()->$action($version);
       }
     }
   }

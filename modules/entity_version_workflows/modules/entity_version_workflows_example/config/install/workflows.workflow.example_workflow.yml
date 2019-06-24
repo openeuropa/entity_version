@@ -10,9 +10,11 @@ third_party_settings:
   entity_version_workflows:
     create_new_draft:
       minor: increase
+      patch: increase
     publish:
       major: increase
       minor: reset
+      patch: decrease
 id: example_workflow
 label: 'Example workflow'
 type: content_moderation

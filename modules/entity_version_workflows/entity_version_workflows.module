@@ -7,6 +7,7 @@
 
 declare(strict_types = 1);
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
@@ -45,7 +46,7 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
   $form['version'] = [
     '#type' => 'details',
     '#title' => t('Version control'),
-    '#description' => t('Select an action to do with each version number when this transition is being used.'),
+    '#description' => t('Select what should happen to the version number when this transition is used.'),
     '#open' => TRUE,
   ];
 
@@ -54,10 +55,10 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
     '#title' => t('Major'),
     '#default_value' => $values ? $values['major'] : '',
     '#options' => [
-      '' => 'None',
-      'increase' => 'Increase',
-      'decrease' => 'Decrease',
-      'reset' => 'Reset',
+      '' => t('Nothing'),
+      'increase' => t('Increase'),
+      'decrease' => t('Decrease'),
+      'reset' => t('Reset'),
     ],
     '#required' => FALSE,
   ];
@@ -67,10 +68,10 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
     '#title' => t('Minor'),
     '#default_value' => $values ? $values['minor'] : '',
     '#options' => [
-      '' => 'None',
-      'increase' => 'Increase',
-      'decrease' => 'Decrease',
-      'reset' => 'Reset',
+      '' => t('Nothing'),
+      'increase' => t('Increase'),
+      'decrease' => t('Decrease'),
+      'reset' => t('Reset'),
     ],
     '#required' => FALSE,
   ];
@@ -80,10 +81,10 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
     '#title' => t('Patch'),
     '#default_value' => $values ? $values['patch'] : '',
     '#options' => [
-      '' => 'None',
-      'increase' => 'Increase',
-      'decrease' => 'Decrease',
-      'reset' => 'Reset',
+      '' => t('Nothing'),
+      'increase' => t('Increase'),
+      'decrease' => t('Decrease'),
+      'reset' => t('Reset'),
     ],
     '#required' => FALSE,
   ];
@@ -119,10 +120,9 @@ function _entity_version_workflows_form_transition_add_form_builder($entity_type
 
   if ($values) {
     $workflow->setThirdPartySetting('entity_version_workflows', $form_state->getValue('id'), $values);
+    return;
   }
-  else {
-    $workflow->unsetThirdPartySetting('entity_version_workflows', $form_state->getValue('id'));
-  }
+  $workflow->unsetThirdPartySetting('entity_version_workflows', $form_state->getValue('id'));
 }
 
 /**
@@ -130,7 +130,7 @@ function _entity_version_workflows_form_transition_add_form_builder($entity_type
  */
 function entity_version_workflows_entity_presave(EntityInterface $entity) {
   // Catch the node entity and update the entity version field.
-  if (!($entity instanceof NodeInterface)) {
+  if (!($entity instanceof ContentEntityInterface)) {
     return;
   }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\Tests\entity_version_workflows_example\Functional;
+namespace Drupal\Tests\entity_version_workflows\Functional;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -92,7 +92,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('draft', $node->moderation_state->value);
     $this->assertEqual('0', $node->field_version->major);
     $this->assertEqual('1', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('1', $node->field_version->patch);
 
     // Create a new draft revision.
     $this->drupalPostForm($path, [
@@ -104,7 +104,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('draft', $node->moderation_state->value);
     $this->assertEqual('0', $node->field_version->major);
     $this->assertEqual('2', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('2', $node->field_version->patch);
 
     // Create a new draft revision.
     $this->drupalPostForm($path, [
@@ -116,7 +116,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('draft', $node->moderation_state->value);
     $this->assertEqual('0', $node->field_version->major);
     $this->assertEqual('3', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('3', $node->field_version->patch);
 
     // Create a new published revision.
     $this->drupalPostForm($path, [
@@ -128,7 +128,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('published', $node->moderation_state->value);
     $this->assertEqual('1', $node->field_version->major);
     $this->assertEqual('0', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('2', $node->field_version->patch);
 
     // Create a new draft revision after the published revision.
     $this->drupalPostForm($path, [
@@ -143,7 +143,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('draft', $node->moderation_state->value);
     $this->assertEqual('1', $node->field_version->major);
     $this->assertEqual('1', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('3', $node->field_version->patch);
 
     // Create a new draft revision.
     $this->drupalPostForm($path, [
@@ -157,7 +157,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('draft', $node->moderation_state->value);
     $this->assertEqual('1', $node->field_version->major);
     $this->assertEqual('2', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('4', $node->field_version->patch);
 
     // Create a new published revision.
     $this->drupalPostForm($path, [
@@ -169,7 +169,7 @@ class EntityVersionWorkflowsTest extends BrowserTestBase {
     $this->assertEqual('published', $node->moderation_state->value);
     $this->assertEqual('2', $node->field_version->major);
     $this->assertEqual('0', $node->field_version->minor);
-    $this->assertEqual('0', $node->field_version->patch);
+    $this->assertEqual('3', $node->field_version->patch);
   }
 
   /**
