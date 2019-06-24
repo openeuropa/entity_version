@@ -3,6 +3,8 @@
 Entity version allows to attach version number to content revisions that help content editors to understand the evolution of the content item. 
 Versions are composed of major, minor and patch numbers that can be changed manually or by third party modules.
 
+The module ships the Entity version workflows sub-module that allows to configure and control version numbers through workflow state transitions.
+
 ## Development setup
 
 You can build the development site by running the following steps:
