@@ -58,8 +58,11 @@ class EntityVersionWorkflowHandler {
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
     if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {
+      $count_values = count($entity->get($field_name)->getValue());
       foreach ($values as $version => $action) {
-        $entity->get($field_name)->first()->$action($version);
+        for ($i = 0; $i < $count_values; $i++) {
+          $entity->get($field_name)->get($i)->$action($version);
+        }
       }
     }
   }
