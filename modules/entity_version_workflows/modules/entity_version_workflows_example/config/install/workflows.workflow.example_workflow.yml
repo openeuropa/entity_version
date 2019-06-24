@@ -9,12 +9,13 @@ dependencies:
 third_party_settings:
   entity_version_workflows:
     create_new_draft:
-      minor: increase
       patch: increase
+    validate:
+      minor: increase
+      patch: reset
     publish:
       major: increase
       minor: reset
-      patch: decrease
 id: example_workflow
 label: 'Example workflow'
 type: content_moderation
@@ -25,11 +26,16 @@ type_settings:
       published: false
       default_revision: false
       weight: 0
+    validated:
+      label: Validated
+      published: false
+      default_revision: false
+      weight: 1
     published:
       label: Published
       published: true
       default_revision: true
-      weight: 1
+      weight: 2
   transitions:
     create_new_draft:
       label: 'Create New Draft'
@@ -37,13 +43,20 @@ type_settings:
       weight: 0
       from:
         - draft
+        - validated
         - published
-    publish:
-      label: Publish
-      to: published
+    validate:
+      label: 'Validate'
+      to: validated
       weight: 1
       from:
         - draft
+    publish:
+      label: 'Publish'
+      to: published
+      weight: 3
+      from:
+        - validated
         - published
   entity_types:
     node:

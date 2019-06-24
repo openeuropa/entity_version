@@ -6,11 +6,12 @@ namespace Drupal\entity_version_workflows\Services;
 
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Handler to control the entity version numbers for when workflows are used.
  */
-class EntityVersionWorkflowHandler {
+class EntityVersionWorkflowManager {
 
   /**
    * The moderation information service.
@@ -20,13 +21,23 @@ class EntityVersionWorkflowHandler {
   protected $moderationInfo;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs a new EntityVersionWorkflowHandler.
    *
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
    *   The moderation information service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(ModerationInformationInterface $moderation_info) {
+  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entityTypeManager) {
     $this->moderationInfo = $moderation_info;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -52,9 +63,20 @@ class EntityVersionWorkflowHandler {
     $workflow_plugin = $workflow->getTypePlugin();
 
     // Compute the transition being used in order to get the version actions
-    // from its config.
-    $current_state = $entity->original->moderation_state->value;
+    // from its config. For this, we need to load the lastest revision of the
+    // entity.
+    $entity_type = $entity->getEntityType();
+    $results = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->getQuery()
+      ->condition($entity_type->getKey('id'), $entity->id())
+      ->allRevisions()
+      ->execute();
+    $results = array_keys($results);
+    $revision_id = end($results);
+    $revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadRevision($revision_id);
+
+    $current_state = $revision->moderation_state->value;
     $next_state = $entity->moderation_state->value;
+
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
     if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {

@@ -137,8 +137,8 @@ function entity_version_workflows_entity_presave(EntityInterface $entity) {
   foreach ($bundle_fields as $field) {
     /** @var \Drupal\field\Entity\FieldConfig $field */
     if ($field->getType() === 'entity_version') {
-      /** @var \Drupal\entity_version_workflows\Services\EntityVersionWorkflowHandler $entity_version_handler */
-      $entity_version_handler = \Drupal::service('entity_version_workflows.entity_version_workflow_handler');
+      /** @var \Drupal\entity_version_workflows\Services\EntityVersionWorkflowManager $entity_version_manager */
+      $entity_version_handler = \Drupal::service('entity_version_workflows.entity_version_workflow_manager');
       $entity_version_handler->updateEntityVersion($entity, $field->getName());
       break;
     }
