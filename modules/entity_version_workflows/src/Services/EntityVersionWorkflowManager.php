@@ -63,7 +63,7 @@ class EntityVersionWorkflowManager {
     $workflow_plugin = $workflow->getTypePlugin();
 
     // Compute the transition being used in order to get the version actions
-    // from its config. For this, we need to load the lastest revision of the
+    // from its config. For this, we need to load the latest revision of the
     // entity.
     $entity_type = $entity->getEntityType();
     $results = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->getQuery()
