@@ -13,13 +13,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\workflows\WorkflowInterface;
 
 /**
- * Implements hook_form_FORM_ID_alter().
- */
-function entity_version_workflows_form_workflow_type_edit_form_alter(&$form, FormStateInterface $form_state) {
-  $form['#submit'][] = '_entity_version_workflows_workflow_type_submit';
-}
-
-/**
  * Implements hook_form_alter().
  */
 function entity_version_workflows_form_alter(&$form, FormStateInterface $form_state, $form_id) {
@@ -40,7 +33,7 @@ function entity_version_workflows_form_alter(&$form, FormStateInterface $form_st
  */
 function _entity_version_workflows_alter_transition_forms(&$form, FormStateInterface $form_state, $form_id): void {
   $workflow = $form_state->getFormObject()->getEntity();
-  $values = $workflow->getThirdPartySetting('entity_version_workflows', $form['id']['#value']);
+  $values = isset($form['id']['#value']) ? $workflow->getThirdPartySetting('entity_version_workflows', $form['id']['#value']) : [];
 
   $form['version'] = [
     '#type' => 'details',
@@ -49,46 +42,29 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
     '#open' => TRUE,
   ];
 
-  $form['version']['major'] = [
-    '#type' => 'select',
-    '#title' => t('Major'),
-    '#default_value' => $values ? $values['major'] : '',
-    '#options' => [
-      '' => t('Nothing'),
-      'increase' => t('Increase'),
-      'decrease' => t('Decrease'),
-      'reset' => t('Reset'),
-    ],
-    '#required' => FALSE,
+  $versions = [
+    'major' => t('Major'),
+    'minor' => t('Minor'),
+    'patch' => t('Patch'),
   ];
 
-  $form['version']['minor'] = [
-    '#type' => 'select',
-    '#title' => t('Minor'),
-    '#default_value' => $values ? $values['minor'] : '',
-    '#options' => [
-      '' => t('Nothing'),
-      'increase' => t('Increase'),
-      'decrease' => t('Decrease'),
-      'reset' => t('Reset'),
-    ],
-    '#required' => FALSE,
-  ];
+  foreach ($versions as $version => $label) {
+    $form['version'][$version] = [
+      '#type' => 'select',
+      '#title' => $label,
+      '#default_value' => $values ? $values[$version] : '',
+      '#options' => [
+        '' => t('Nothing'),
+        'increase' => t('Increase'),
+        'decrease' => t('Decrease'),
+        'reset' => t('Reset'),
+      ],
+      '#required' => FALSE,
+    ];
 
-  $form['version']['patch'] = [
-    '#type' => 'select',
-    '#title' => t('Patch'),
-    '#default_value' => $values ? $values['patch'] : '',
-    '#options' => [
-      '' => t('Nothing'),
-      'increase' => t('Increase'),
-      'decrease' => t('Decrease'),
-      'reset' => t('Reset'),
-    ],
-    '#required' => FALSE,
-  ];
+  }
 
-  $form['#entity_builders'][] = '_entity_version_workflows_form_transition_add_form_builder';
+  $form['#entity_builders'][] = 'entity_version_workflows_form_transition_add_form_builder';
 }
 
 /**
@@ -103,7 +79,7 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The form state object.
  */
-function _entity_version_workflows_form_transition_add_form_builder($entity_type, WorkflowInterface $workflow, &$form, FormStateInterface $form_state): void {
+function entity_version_workflows_form_transition_add_form_builder($entity_type, WorkflowInterface $workflow, &$form, FormStateInterface $form_state): void {
   $version_fields = [
     'major',
     'minor',
@@ -121,6 +97,7 @@ function _entity_version_workflows_form_transition_add_form_builder($entity_type
     $workflow->setThirdPartySetting('entity_version_workflows', $form_state->getValue('id'), $values);
     return;
   }
+
   $workflow->unsetThirdPartySetting('entity_version_workflows', $form_state->getValue('id'));
 }
 
@@ -129,7 +106,7 @@ function _entity_version_workflows_form_transition_add_form_builder($entity_type
  */
 function entity_version_workflows_entity_presave(EntityInterface $entity) {
   // Catch the node entity and update the entity version field.
-  if (!($entity instanceof ContentEntityInterface)) {
+  if (!$entity instanceof ContentEntityInterface) {
     return;
   }
 
@@ -137,7 +114,7 @@ function entity_version_workflows_entity_presave(EntityInterface $entity) {
   foreach ($bundle_fields as $field) {
     /** @var \Drupal\field\Entity\FieldConfig $field */
     if ($field->getType() === 'entity_version') {
-      /** @var \Drupal\entity_version_workflows\Services\EntityVersionWorkflowManager $entity_version_manager */
+      /** @var \Drupal\entity_version_workflows\EntityVersionWorkflowManager $entity_version_manager */
       $entity_version_handler = \Drupal::service('entity_version_workflows.entity_version_workflow_manager');
       $entity_version_handler->updateEntityVersion($entity, $field->getName());
       break;

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_version_workflows\Services;
+namespace Drupal\entity_version_workflows;
 
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -79,12 +79,14 @@ class EntityVersionWorkflowManager {
 
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
-    if ($values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id())) {
-      $count_values = count($entity->get($field_name)->getValue());
-      foreach ($values as $version => $action) {
-        for ($i = 0; $i < $count_values; $i++) {
-          $entity->get($field_name)->get($i)->$action($version);
-        }
+    $values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id());
+    if (!$values) {
+      return;
+    }
+
+    foreach ($values as $version => $action) {
+      foreach ($entity->get($field_name)->getValue() as $delta => $value) {
+        $entity->get($field_name)->get($delta)->$action($version);
       }
     }
   }

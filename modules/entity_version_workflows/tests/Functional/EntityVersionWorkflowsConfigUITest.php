@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\Tests\entity_version_workflows\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\workflows\Entity\Workflow;
 
 /**
  * Tests the entity version workflows configuration UI.
@@ -19,24 +20,7 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Permissions to grant admin user.
-   *
-   * @var array
-   */
-  protected $permissions = [
-    'administer workflows',
-    'access administration pages',
-    'administer content types',
-    'administer nodes',
-    'view latest version',
-    'view any unpublished content',
-    'access content overview',
-  ];
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'path',
@@ -45,6 +29,8 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
     'system',
     'workflows',
     'content_moderation',
+    'entity_version',
+    'entity_version_workflows',
   ];
 
   /**
@@ -52,7 +38,17 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->adminUser = $this->drupalCreateUser($this->permissions);
+
+    $this->adminUser = $this->drupalCreateUser([
+      'administer workflows',
+      'access administration pages',
+      'administer content types',
+      'administer nodes',
+      'view latest version',
+      'view any unpublished content',
+      'access content overview',
+    ]);
+
     $this->drupalLogin($this->adminUser);
   }
 
@@ -61,39 +57,50 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
    */
   public function testEntityVersionWorkflowsConfigUi(): void {
     $this->drupalGet('admin/config/workflow/workflows/add');
-    $this->getSession()->getPage()->fillField('Label','Content moderation');
-    $this->getSession()->getPage()->selectFieldOption('Workflow type','Content moderation');
+    $this->getSession()->getPage()->fillField('Label', 'Content moderation');
+    $this->getSession()->getPage()->fillField('Machine-readable name', 'content_moderation');
+    $this->getSession()->getPage()->selectFieldOption('Workflow type', 'Content moderation');
     $this->getSession()->getPage()->pressButton('Save');
     $this->drupalGet('admin/config/workflow/workflows/manage/content_moderation/add_transition');
 
-    // Nothing option.
-    $this->assertSession()->optionExists('Major', '');
-    // Increase option.
+    $this->assertSession()->selectExists('Major');
     $this->assertSession()->optionExists('Major', 'increase');
-    // Decrease option.
     $this->assertSession()->optionExists('Major', 'decrease');
-    // Reset option.
     $this->assertSession()->optionExists('Major', 'reset');
 
     $this->assertSession()->selectExists('Minor');
-    // Nothing option.
     $this->assertSession()->optionExists('Minor', '');
-    // Increase option.
     $this->assertSession()->optionExists('Minor', 'increase');
-    // Decrease option.
     $this->assertSession()->optionExists('Minor', 'decrease');
-    // Reset option.
     $this->assertSession()->optionExists('Minor', 'reset');
 
     $this->assertSession()->selectExists('Patch');
-    // Nothing option.
     $this->assertSession()->optionExists('Patch', '');
-    // Increase option.
     $this->assertSession()->optionExists('Patch', 'increase');
-    // Decrease option.
     $this->assertSession()->optionExists('Patch', 'decrease');
-    // Reset option.
     $this->assertSession()->optionExists('Patch', 'reset');
+
+    // Assert that we have no third party settings from our module on the
+    // created workflow.
+    $workflow = Workflow::load('content_moderation');
+    $this->assertEmpty($workflow->getThirdPartySettings('entity_version_workflows'));
+
+    // Edit an existing transition from the workflow and specify version rules.
+    $this->drupalGet('admin/config/workflow/workflows/manage/content_moderation/transition/create_new_draft');
+    file_put_contents('/var/www/html/print.html', $this->getSession()->getPage()->getHtml());
+    $this->getSession()->getPage()->selectFieldOption('Major', 'increase');
+    $this->getSession()->getPage()->selectFieldOption('Minor', 'decrease');
+    $this->getSession()->getPage()->selectFieldOption('Patch', 'reset');
+    $this->getSession()->getPage()->pressButton('Save');
+
+    // Check that the third party settings have been saved correctly.
+    $workflow = Workflow::load('content_moderation');
+    $expected = [
+      'major' => 'increase',
+      'minor' => 'decrease',
+      'patch' => 'reset',
+    ];
+    $this->assertEquals($expected, $workflow->getThirdPartySetting('entity_version_workflows', 'create_new_draft'));
   }
 
 }
