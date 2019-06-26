@@ -3,6 +3,8 @@
 Entity version allows to attach version number to content revisions that help content editors to understand the evolution of the content item. 
 Versions are composed of major, minor and patch numbers that can be changed manually or by third party modules.
 
+The module ships the Entity version workflows sub-module that allows to configure and control version numbers through workflow state transitions.
+
 ## Development setup
 
 You can build the development site by running the following steps:
@@ -15,7 +17,7 @@ composer install
 
 A post command hook (`drupal:site-setup`) is triggered automatically after `composer install`.
 It will make sure that the necessary symlinks are properly setup in the development site.
-It will also perform token substitution in development configuration files such as `behat.yml.dist`.
+It will also perform token substitution in development configuration files such as `phpunit.xml.dist`.
 
 * Install test site by running:
 
@@ -85,12 +87,6 @@ To run the phpunit tests:
 
 ```bash
 docker-compose exec web ./vendor/bin/phpunit
-```
-
-To run the behat tests:
-
-```bash
-docker-compose exec web ./vendor/bin/behat
 ```
 
 ## Contributing
