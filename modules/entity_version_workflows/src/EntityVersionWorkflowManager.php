@@ -68,15 +68,15 @@ class EntityVersionWorkflowManager {
     $entity_type = $entity->getEntityType();
     $results = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->getQuery()
       ->condition($entity_type->getKey('id'), $entity->id())
-      ->allRevisions()
+      ->latestRevision()
       ->execute();
-    $results = array_keys($results);
-    $revision_id = end($results);
-    $revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadRevision($revision_id);
+    $revision_id = array_keys($results);
+    $revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadRevision(reset($revision_id));
 
+    // Retrieve the configured actions to perform for the version field numbers
+    // from the transition.
     $current_state = $revision->moderation_state->value;
     $next_state = $entity->moderation_state->value;
-
     /** @var \Drupal\workflows\TransitionInterface $transition */
     $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
     $values = $workflow->getThirdPartySetting('entity_version_workflows', $transition->id());
@@ -84,6 +84,7 @@ class EntityVersionWorkflowManager {
       return;
     }
 
+    // Execute all the configured actions on all the values of the field.
     foreach ($values as $version => $action) {
       foreach ($entity->get($field_name)->getValue() as $delta => $value) {
         $entity->get($field_name)->get($delta)->$action($version);
