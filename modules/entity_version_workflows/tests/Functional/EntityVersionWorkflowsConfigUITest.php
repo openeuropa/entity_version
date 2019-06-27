@@ -87,7 +87,6 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
 
     // Edit an existing transition from the workflow and specify version rules.
     $this->drupalGet('admin/config/workflow/workflows/manage/content_moderation/transition/create_new_draft');
-    file_put_contents('/var/www/html/print.html', $this->getSession()->getPage()->getHtml());
     $this->getSession()->getPage()->selectFieldOption('Major', 'increase');
     $this->getSession()->getPage()->selectFieldOption('Minor', 'decrease');
     $this->getSession()->getPage()->selectFieldOption('Patch', 'reset');
