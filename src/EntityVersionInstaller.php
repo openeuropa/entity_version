@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 /**
  * Handles the installation of the entity version field on bundles.
  */
-class EntityVersionInstaller {
+class EntityVersionInstaller implements EntityVersionInstallerInterface {
 
   /**
    * The field config.
@@ -37,28 +37,23 @@ class EntityVersionInstaller {
   }
 
   /**
-   * Assign entity version field to the given bundles.
-   *
-   * @param array $bundles
-   *   Array of entity bundle names.
-   * @param array $default_value
-   *   The default value of the entity version field.
+   * {@inheritdoc}
    */
-  public function addEntityVersionFieldToBundles(array $bundles, array $default_value = []): void {
-    if (!$this->fieldStorageConfig->load('node.version')) {
+  public function install(string $entity_type = 'node', array $bundles = [], array $default_value = []): void {
+    if (!$this->fieldStorageConfig->load("$entity_type.version")) {
       $this->fieldStorageConfig->create([
         'field_name' => 'version',
-        'entity_type' => 'node',
+        'entity_type' => $entity_type,
         'type' => 'entity_version',
       ])->save();
     }
 
     foreach ($bundles as $bundle) {
-      if ($this->fieldConfig->load('node.' . $bundle . '.version')) {
+      if ($this->fieldConfig->load("$entity_type." . $bundle . '.version')) {
         continue;
       }
       $this->fieldConfig->create([
-        'entity_type' => 'node',
+        'entity_type' => $entity_type,
         'field_name' => 'version',
         'bundle' => $bundle,
         'label' => t('Version'),

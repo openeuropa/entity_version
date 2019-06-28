@@ -9,11 +9,12 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 
 /**
- * Tests the EntityVersionInstallerTest service.
+ * Tests the EntityVersionInstaller service.
  */
 class EntityVersionInstallerTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
+
   /**
    * The node type.
    *
@@ -59,13 +60,14 @@ class EntityVersionInstallerTest extends KernelTestBase {
       'name' => 'Test node type',
       'type' => 'test_node_type',
     ]);
+
     $this->nodeType->save();
 
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()
       ->addEntityTypeAndBundle('node', 'test_node_type');
+
     $workflow->save();
-    $this->workflow = $workflow;
   }
 
   /**
@@ -73,7 +75,7 @@ class EntityVersionInstallerTest extends KernelTestBase {
    */
   public function testEntityVersionInstallationService(): void {
     // Assert we don't have the field added by the installer.
-    $this->assertEmpty($this->container->get('entity_type.manager')->getStorage('field_config')->load('node.test_node_type.version'));
+    $this->assertEmpty($this->container->get('entity_type.manager')->getStorage('field_config')->load("node.{$this->nodeType->id()}.version"));
 
     // Add the field by the installer service with the following default value.
     $default_value = [
@@ -81,10 +83,10 @@ class EntityVersionInstallerTest extends KernelTestBase {
       'minor' => 1,
       'patch' => 0,
     ];
-    $bundles = ['test_node_type'];
-    $this->container->get('entity_version.entity_version_installer')->addEntityVersionFieldToBundles($bundles, $default_value);
+
+    $this->container->get('entity_version.entity_version_installer')->install('node', [$this->nodeType->id()], $default_value);
     /** @var \Drupal\field\Entity\FieldConfig $field_config */
-    $field_config = $this->container->get('entity_type.manager')->getStorage('field_config')->load('node.test_node_type.version');
+    $field_config = $this->container->get('entity_type.manager')->getStorage('field_config')->load("node.{$this->nodeType->id()}.version");
     // Assert that the field is added by the installer.
     $this->assertInstanceOf(FieldConfig::class, $field_config);
     $actual_default_value = $field_config->getDefaultValueLiteral();
