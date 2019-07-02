@@ -1,8 +1,16 @@
 # Change Log
 
+## [0.1.1](https://github.com/openeuropa/entity_version/tree/0.1.1) (2019-07-02)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/0.1.0...0.1.1)
+
+**Merged pull requests:**
+
+- OPENEUROPA-1915: Add installer service. [\#7](https://github.com/openeuropa/entity_version/pull/7) ([nagyad](https://github.com/nagyad))
+
 ## [0.1.0](https://github.com/openeuropa/entity_version/tree/0.1.0) (2019-06-27)
 **Merged pull requests:**
 
+- Release-0.1.0: Update change log. [\#6](https://github.com/openeuropa/entity_version/pull/6) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-1912:  Create submodule for workflow transition configuration to control entity version [\#5](https://github.com/openeuropa/entity_version/pull/5) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-1908: FieldWidget and FieldFormatter [\#4](https://github.com/openeuropa/entity_version/pull/4) ([hernani](https://github.com/hernani))
 - OPENEUROPA-1905: Create field type plugin for entity revisions. [\#2](https://github.com/openeuropa/entity_version/pull/2) ([nagyad](https://github.com/nagyad))
