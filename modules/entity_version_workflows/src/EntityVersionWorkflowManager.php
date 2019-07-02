@@ -65,13 +65,7 @@ class EntityVersionWorkflowManager {
     // Compute the transition being used in order to get the version actions
     // from its config. For this, we need to load the latest revision of the
     // entity.
-    $entity_type = $entity->getEntityType();
-    $results = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->getQuery()
-      ->condition($entity_type->getKey('id'), $entity->id())
-      ->latestRevision()
-      ->execute();
-    $revision_id = array_keys($results);
-    $revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadRevision(reset($revision_id));
+    $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
 
     // Retrieve the configured actions to perform for the version field numbers
     // from the transition.
