@@ -52,7 +52,7 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
     $form['version'][$version] = [
       '#type' => 'select',
       '#title' => $label,
-      '#default_value' => $values ? $values[$version] : '',
+      '#default_value' => empty($values[$version]) ? '' : $values[$version],
       '#options' => [
         '' => t('Nothing'),
         'increase' => t('Increase'),
@@ -61,8 +61,15 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
       ],
       '#required' => FALSE,
     ];
-
   }
+
+  $form['version']['check_values_changed'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Check values changed'),
+    '#description' => t('Apply the rules above only if the entity has changed during the transition.'),
+    '#default_value' => empty($values['check_values_changed']) ? 0 : $values['check_values_changed'],
+    '#required' => FALSE,
+  ];
 
   $form['#entity_builders'][] = 'entity_version_workflows_form_transition_add_form_builder';
 }
@@ -80,14 +87,15 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
  *   The form state object.
  */
 function entity_version_workflows_form_transition_add_form_builder($entity_type, WorkflowInterface $workflow, &$form, FormStateInterface $form_state): void {
-  $version_fields = [
+  $config_fields = [
     'major',
     'minor',
     'patch',
+    'check_values_changed',
   ];
   $values = [];
 
-  foreach ($version_fields as $field) {
+  foreach ($config_fields as $field) {
     if ($form_state->getValue($field)) {
       $values[$field] = $form_state->getValue($field);
     }

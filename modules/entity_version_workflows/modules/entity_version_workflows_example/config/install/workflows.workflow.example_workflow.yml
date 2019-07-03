@@ -10,6 +10,7 @@ third_party_settings:
   entity_version_workflows:
     create_new_draft:
       patch: increase
+      check_values_changed: true
     validate:
       minor: increase
       patch: reset

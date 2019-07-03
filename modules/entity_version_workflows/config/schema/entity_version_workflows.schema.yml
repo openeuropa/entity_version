@@ -16,3 +16,6 @@ workflows.workflow.*.third_party.entity_version_workflows:
       patch:
         type: string
         label: 'Patch action'
+      check_values_changed:
+        type: boolean
+        label: 'Check values changed'

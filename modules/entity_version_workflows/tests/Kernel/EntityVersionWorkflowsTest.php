@@ -72,10 +72,12 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $this->assertNodeVersion($node, 0, 0, 0);
 
     // Save to increase the patch number (stay in draft).
+    $node->set('title', 'New title');
     $node->save();
     $this->assertNodeVersion($node, 0, 0, 1);
     $node->save();
-    $this->assertNodeVersion($node, 0, 0, 2);
+    // Since Check values changed is enabled the version remains the same.
+    $this->assertNodeVersion($node, 0, 0, 1);
 
     // Validate the content to increase the minor and reset the patch.
     $node->set('moderation_state', 'validated');
@@ -84,8 +86,10 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
 
     // Make a new draft to increase patch on the new minor.
     $node->set('moderation_state', 'draft');
+    $node->set('title', 'New title 1');
     $node->save();
     $this->assertNodeVersion($node, 0, 1, 1);
+    $node->set('title', 'New title 2');
     $node->save();
     $this->assertNodeVersion($node, 0, 1, 2);
 
@@ -101,6 +105,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->set('moderation_state', 'draft');
     $node->save();
     $this->assertNodeVersion($node, 1, 0, 1);
+    $node->set('title', 'New title 3');
     $node->save();
     $this->assertNodeVersion($node, 1, 0, 2);
 
