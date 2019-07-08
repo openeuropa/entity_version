@@ -139,12 +139,13 @@ class EntityVersionWorkflowManager {
 
     // Let others change the blacklist.
     $this->moduleHandler->alter('check_values_changed', $field_blacklist);
-
+    // We consider the latest revision as original to compare with the entity.
+    $original = $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
     // Remove the blacklisted fields from checking.
     $fields = array_diff($fields, $field_blacklist);
     foreach ($fields as $field) {
       // Check if the values are changed in the entity.
-      if ($entity->get($field)->hasAffectingChanges($entity->original->get($field)->filterEmptyItems(), $entity->language()->getId())) {
+      if ($entity->get($field)->hasAffectingChanges($original->get($field)->filterEmptyItems(), $entity->language()->getId())) {
         return TRUE;
       }
     }

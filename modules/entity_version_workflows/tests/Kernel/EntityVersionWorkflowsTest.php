@@ -105,7 +105,13 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->set('moderation_state', 'draft');
     $node->save();
     $this->assertNodeVersion($node, 1, 0, 1);
+    // We change value so the version will change.
     $node->set('title', 'New title 3');
+    $node->save();
+    $this->assertNodeVersion($node, 1, 0, 2);
+    // Check if values are not changed no version is changed.
+    $node->save();
+    $this->assertNodeVersion($node, 1, 0, 2);
     $node->save();
     $this->assertNodeVersion($node, 1, 0, 2);
 
@@ -113,9 +119,10 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->set('moderation_state', 'validated');
     $node->save();
     $this->assertNodeVersion($node, 1, 1, 0);
+    // Move back to draft without changing the value and version.
     $node->set('moderation_state', 'draft');
     $node->save();
-    $this->assertNodeVersion($node, 1, 1, 1);
+    $this->assertNodeVersion($node, 1, 1, 0);
   }
 
   /**
