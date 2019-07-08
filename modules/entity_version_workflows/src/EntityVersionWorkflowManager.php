@@ -98,8 +98,8 @@ class EntityVersionWorkflowManager {
       return;
     }
 
-    // If the config is set to "1" we check if the entity values has changed
-    // and then update the version numbers.
+    // If the config is defined to check entity field values changes we don't
+    // act if they did not change.
     if (!empty($config_values['check_values_changed'])) {
       if (!$this->isEntityChanged($entity)) {
         return;

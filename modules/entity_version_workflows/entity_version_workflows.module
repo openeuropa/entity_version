@@ -66,7 +66,7 @@ function _entity_version_workflows_alter_transition_forms(&$form, FormStateInter
   $form['version']['check_values_changed'] = [
     '#type' => 'checkbox',
     '#title' => t('Check values changed'),
-    '#description' => t('Apply the rules above only if the entity has changed during the transition.'),
+    '#description' => t('Apply the rules above only if the entity field values have changed during the transition.'),
     '#default_value' => empty($values['check_values_changed']) ? 0 : $values['check_values_changed'],
     '#required' => FALSE,
   ];
