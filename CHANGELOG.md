@@ -1,10 +1,18 @@
 # Change Log
 
+## [1.0.0-beta1](https://github.com/openeuropa/entity_version/tree/1.0.0-beta1) (2019-07-09)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/0.1.1...1.0.0-beta1)
+
+**Merged pull requests:**
+
+- OPENEUROPA-2037: Implement new config setting for value check. [\#9](https://github.com/openeuropa/entity_version/pull/9) ([nagyad](https://github.com/nagyad))
+
 ## [0.1.1](https://github.com/openeuropa/entity_version/tree/0.1.1) (2019-07-02)
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/0.1.0...0.1.1)
 
 **Merged pull requests:**
 
+- Release-0.1.1 [\#8](https://github.com/openeuropa/entity_version/pull/8) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-1915: Add installer service. [\#7](https://github.com/openeuropa/entity_version/pull/7) ([nagyad](https://github.com/nagyad))
 
 ## [0.1.0](https://github.com/openeuropa/entity_version/tree/0.1.0) (2019-06-27)
