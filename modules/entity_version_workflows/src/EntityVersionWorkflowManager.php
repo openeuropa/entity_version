@@ -8,12 +8,21 @@ use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\entity_version_workflows\Event\CheckEntityChangedEvent;
 use InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Handler to control the entity version numbers for when workflows are used.
  */
 class EntityVersionWorkflowManager {
+
+  /**
+   * The symfony event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * The moderation information service.
@@ -45,11 +54,13 @@ class EntityVersionWorkflowManager {
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    */
-  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, EventDispatcherInterface $eventDispatcher) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $moduleHandler;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -130,12 +141,17 @@ class EntityVersionWorkflowManager {
       return FALSE;
     }
     $fields = array_keys($entity->toArray());
-    // Blacklist dynamic fields from the check.
+
+    // Blacklist dynamic fields from the check and allow subscribers to change.
     $field_blacklist = [
       'vid',
       'revision_timestamp',
       'moderation_state',
     ];
+    $event = new CheckEntityChangedEvent();
+    $event->setFieldBlacklist($field_blacklist);
+    $this->eventDispatcher->dispatch(CheckEntityChangedEvent::EVENT, $event);
+    $field_blacklist = $event->getFieldBlacklist();
 
     // Let others change the blacklist.
     $this->moduleHandler->alter('check_values_changed', $field_blacklist);
