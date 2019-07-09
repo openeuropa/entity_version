@@ -80,6 +80,8 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
     $this->assertSession()->optionExists('Patch', 'decrease');
     $this->assertSession()->optionExists('Patch', 'reset');
 
+    $this->assertSession()->checkboxNotChecked('Check values changed');
+
     // Assert that we have no third party settings from our module on the
     // created workflow.
     $workflow = Workflow::load('content_moderation');
@@ -90,6 +92,7 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption('Major', 'increase');
     $this->getSession()->getPage()->selectFieldOption('Minor', 'decrease');
     $this->getSession()->getPage()->selectFieldOption('Patch', 'reset');
+    $this->getSession()->getPage()->checkField('Check values changed');
     $this->getSession()->getPage()->pressButton('Save');
 
     // Check that the third party settings have been saved correctly.
@@ -98,6 +101,7 @@ class EntityVersionWorkflowsConfigUITest extends BrowserTestBase {
       'major' => 'increase',
       'minor' => 'decrease',
       'patch' => 'reset',
+      'check_values_changed' => 1,
     ];
     $this->assertEquals($expected, $workflow->getThirdPartySetting('entity_version_workflows', 'create_new_draft'));
   }
