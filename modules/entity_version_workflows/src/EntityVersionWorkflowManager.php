@@ -6,6 +6,7 @@ namespace Drupal\entity_version_workflows;
 
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangesDetectionTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\entity_version_workflows\Event\CheckEntityChangedEvent;
 use InvalidArgumentException;
@@ -15,6 +16,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Handler to control the entity version numbers for when workflows are used.
  */
 class EntityVersionWorkflowManager {
+
+  use EntityChangesDetectionTrait {
+    getFieldsToSkipFromTranslationChangesCheck as getFieldsToSkipFromEntityChangesCheck;
+  }
 
   /**
    * The symfony event dispatcher.
@@ -133,11 +138,7 @@ class EntityVersionWorkflowManager {
     $fields = array_keys($entity->toArray());
 
     // Blacklist dynamic fields from the check and allow subscribers to change.
-    $field_blacklist = [
-      'vid',
-      'revision_timestamp',
-      'moderation_state',
-    ];
+    $field_blacklist = $this->getFieldsToSkipFromEntityChangesCheck($entity);
     $event = new CheckEntityChangedEvent();
     $event->setFieldBlacklist($field_blacklist);
     $this->eventDispatcher->dispatch(CheckEntityChangedEvent::EVENT, $event);
