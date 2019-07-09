@@ -7,7 +7,6 @@ namespace Drupal\entity_version_workflows;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\entity_version_workflows\Event\CheckEntityChangedEvent;
 use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -39,27 +38,18 @@ class EntityVersionWorkflowManager {
   protected $entityTypeManager;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a new EntityVersionWorkflowHandler.
    *
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
    *   The moderation information service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The symfony event dispatcher.
    */
-  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, EventDispatcherInterface $eventDispatcher) {
+  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entityTypeManager, EventDispatcherInterface $eventDispatcher) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entityTypeManager;
-    $this->moduleHandler = $moduleHandler;
     $this->eventDispatcher = $eventDispatcher;
   }
 
@@ -153,15 +143,13 @@ class EntityVersionWorkflowManager {
     $this->eventDispatcher->dispatch(CheckEntityChangedEvent::EVENT, $event);
     $field_blacklist = $event->getFieldBlacklist();
 
-    // Let others change the blacklist.
-    $this->moduleHandler->alter('check_values_changed', $field_blacklist);
     // We consider the latest revision as original to compare with the entity.
-    $original = $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
+    $latestRevision = $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
     // Remove the blacklisted fields from checking.
     $fields = array_diff($fields, $field_blacklist);
     foreach ($fields as $field) {
       // Check if the values are changed in the entity.
-      if ($entity->get($field)->hasAffectingChanges($original->get($field)->filterEmptyItems(), $entity->language()->getId())) {
+      if ($entity->get($field)->hasAffectingChanges($latestRevision->get($field)->filterEmptyItems(), $entity->language()->getId())) {
         return TRUE;
       }
     }

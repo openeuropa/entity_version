@@ -18,20 +18,26 @@ class CheckEntityChangedEvent extends Event {
    *
    * @var array
    */
-  protected $field_blacklist;
+  protected $fieldBlacklist;
 
   /**
+   * Get the array of blacklisted fields.
+   *
    * @return array
+   *   Return the array of blacklisted fields.
    */
   public function getFieldBlacklist() {
-    return $this->field_blacklist;
+    return $this->fieldBlacklist;
   }
 
   /**
+   * Set the black listed fields.
+   *
    * @param array $field_blacklist
+   *   The black listed field names.
    */
-  public function setFieldBlacklist($field_blacklist) {
-    $this->field_blacklist = $field_blacklist;
+  public function setFieldBlacklist(array $field_blacklist) {
+    $this->fieldBlacklist = $field_blacklist;
   }
 
 }
