@@ -65,6 +65,9 @@ class EntityVersionWorkflowManager {
    *   The content entity.
    * @param string $field_name
    *   The name of the entity version field.
+   *
+   * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+   * @SuppressWarnings(PHPMD.NPathComplexity)
    */
   public function updateEntityVersion(ContentEntityInterface $entity, $field_name): void {
     if ($entity->isNew()) {
@@ -106,11 +109,13 @@ class EntityVersionWorkflowManager {
 
     // If the config is defined to check entity field values changes we don't
     // act if they did not change.
-    if (!empty($config_values['check_values_changed'])) {
-      if (!$this->isEntityChanged($entity)) {
-        return;
-      }
-      // Remove this to leave the version settings only for the iteration.
+    $check_values_changed = !empty($config_values['check_values_changed']);
+    if ($check_values_changed && !$this->isEntityChanged($entity)) {
+      return;
+    }
+
+    // Remove this to leave the version settings only for the iteration.
+    if (isset($config_values['check_values_changed'])) {
       unset($config_values['check_values_changed']);
     }
 
@@ -132,12 +137,10 @@ class EntityVersionWorkflowManager {
    *   Return true if the entity has changed, otherwise return false.
    */
   protected function isEntityChanged(ContentEntityInterface $entity): bool {
-    if (empty($entity->original)) {
-      return FALSE;
-    }
     $fields = array_keys($entity->toArray());
 
-    // Blacklist dynamic fields from the check and allow subscribers to change.
+    // Some of the fields we should not check if there are changes on. This is
+    // because they are irrelevant or that they are computed.
     $field_blacklist = $this->getFieldsToSkipFromEntityChangesCheck($entity);
     $event = new CheckEntityChangedEvent();
     $event->setFieldBlacklist($field_blacklist);
@@ -145,11 +148,11 @@ class EntityVersionWorkflowManager {
     $field_blacklist = $event->getFieldBlacklist();
 
     // We consider the latest revision as original to compare with the entity.
-    $latestRevision = $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
+    $latestRevision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
     // Remove the blacklisted fields from checking.
     $fields = array_diff($fields, $field_blacklist);
     foreach ($fields as $field) {
-      // Check if the values are changed in the entity.
+      // If we encounter a change, we directly return.
       if ($entity->get($field)->hasAffectingChanges($latestRevision->get($field)->filterEmptyItems(), $entity->language()->getId())) {
         return TRUE;
       }

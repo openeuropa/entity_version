@@ -7,14 +7,17 @@ namespace Drupal\entity_version_workflows\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Event class to be dispatched from EntityVersionWorkflowManager service.
+ * Dispatched by EntityVersionWorkflowManager::isEntityChanged().
+ *
+ * Allows to alter the list of fields that should be skipped when checking an
+ * entity for value changes.
  */
 class CheckEntityChangedEvent extends Event {
 
   const EVENT = 'entity_version_worfklows.check_entity_changed_event';
 
   /**
-   * The array of field names to exclude from change check.
+   * The array of field names to skip.
    *
    * @var array
    */
@@ -26,7 +29,7 @@ class CheckEntityChangedEvent extends Event {
    * @return array
    *   Return the array of blacklisted fields.
    */
-  public function getFieldBlacklist() {
+  public function getFieldBlacklist(): array {
     return $this->fieldBlacklist;
   }
 
@@ -36,7 +39,7 @@ class CheckEntityChangedEvent extends Event {
    * @param array $field_blacklist
    *   The black listed field names.
    */
-  public function setFieldBlacklist(array $field_blacklist) {
+  public function setFieldBlacklist(array $field_blacklist): void {
     $this->fieldBlacklist = $field_blacklist;
   }
 

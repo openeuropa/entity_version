@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\entity_version_workflows\Kernel;
 
+use Drupal\entity_version_workflows_example\EventSubscriber\TestCheckEntityChangedSubscriber;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\NodeInterface;
 
@@ -9,6 +10,13 @@ use Drupal\node\NodeInterface;
  * Test the entity version numbers with workflow transitions.
  */
 class EntityVersionWorkflowsTest extends KernelTestBase {
+
+  /**
+   * The node storage.
+   *
+   * @var \Drupal\node\NodeStorageInterface
+   */
+  protected $nodeStorage;
 
   /**
    * {@inheritdoc}
@@ -49,22 +57,21 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $this->installEntitySchema('content_moderation_state');
 
     $this->installSchema('node', 'node_access');
+
+    $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
   }
 
   /**
    * Test the entity version numbers with workflow transitions.
    */
   public function testEntityVersionWorkflow() {
-    /** @var \Drupal\node\NodeStorageInterface $node_storage */
-    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-
     $values = [
       'title' => 'Workflow node',
       'type' => 'entity_version_workflows_example',
       'moderation_state' => 'draft',
     ];
     /** @var \Drupal\node\NodeInterface $node */
-    $node = $node_storage->create($values);
+    $node = $this->nodeStorage->create($values);
     $node->save();
 
     // There is no default value so all versions should be 0.
@@ -76,7 +83,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->save();
     $this->assertNodeVersion($node, 0, 0, 1);
     $node->save();
-    // Since Check values changed is enabled the version remains the same.
+    // Since the "check values changed" is enabled the version remains the same.
     $this->assertNodeVersion($node, 0, 0, 1);
 
     // Validate the content to increase the minor and reset the patch.
@@ -126,6 +133,40 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
   }
 
   /**
+   * Tests that we can alter the blacklisted fields that are skipped.
+   */
+  public function testCheckEntityChangedEvent() {
+    $values = [
+      'title' => 'Workflow node',
+      'type' => 'entity_version_workflows_example',
+      'moderation_state' => 'draft',
+    ];
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $this->nodeStorage->create($values);
+    $node->save();
+
+    // There is no default value so all versions should be 0.
+    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertNodeVersion($node, 0, 0, 0);
+
+    // Save to increase the patch number (stay in draft).
+    $node->set('title', 'New title');
+    $node->save();
+    $this->assertNodeVersion($node, 0, 0, 1);
+    $node->save();
+    // Since the "check values changed" is enabled the version remains the same.
+    $this->assertNodeVersion($node, 0, 0, 1);
+
+    // Set the state to trigger our test event subscriber.
+    $this->container->get('state')->set(TestCheckEntityChangedSubscriber::STATE, TRUE);
+    $node->set('title', 'Another new title');
+    $node->save();
+    // The version stays the same even if we changed the title because of the
+    // test subscriber which skips the title field.
+    $this->assertNodeVersion($node, 0, 0, 1, 'The version changed because the node title changed and it was not skipped.');
+  }
+
+  /**
    * Assert the entity version field value.
    *
    * @param \Drupal\node\NodeInterface $node
@@ -136,11 +177,13 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
    *   The minor version number.
    * @param string $patch
    *   The patch version number.
+   * @param string $message
+   *   An option error message.
    */
-  protected function assertNodeVersion(NodeInterface $node, string $major, string $minor, string $patch) {
-    $this->assertEqual($major, $node->get('field_version')->major);
-    $this->assertEqual($minor, $node->get('field_version')->minor);
-    $this->assertEqual($patch, $node->get('field_version')->patch);
+  protected function assertNodeVersion(NodeInterface $node, string $major, string $minor, string $patch, $message = '') {
+    $this->assertEqual($major, $node->get('field_version')->major, $message);
+    $this->assertEqual($minor, $node->get('field_version')->minor, $message);
+    $this->assertEqual($patch, $node->get('field_version')->patch, $message);
   }
 
 }
