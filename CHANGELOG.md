@@ -1,10 +1,18 @@
 # Change Log
 
+## [8.x-1.0-beta2](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta2) (2019-08-12)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/1.0.0-beta1...8.x-1.0-beta2)
+
+**Merged pull requests:**
+
+- OPENEUROPA-2076: Prepare module to drupal.org. [\#11](https://github.com/openeuropa/entity_version/pull/11) ([nagyad](https://github.com/nagyad))
+
 ## [1.0.0-beta1](https://github.com/openeuropa/entity_version/tree/1.0.0-beta1) (2019-07-09)
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/0.1.1...1.0.0-beta1)
 
 **Merged pull requests:**
 
+- Release 1.0.0-beta1 [\#10](https://github.com/openeuropa/entity_version/pull/10) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-2037: Implement new config setting for value check. [\#9](https://github.com/openeuropa/entity_version/pull/9) ([nagyad](https://github.com/nagyad))
 
 ## [0.1.1](https://github.com/openeuropa/entity_version/tree/0.1.1) (2019-07-02)
