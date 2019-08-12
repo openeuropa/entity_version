@@ -1,8 +1,8 @@
 {
-    "name": "openeuropa/entity_version",
+    "name": "drupal/entity_version",
     "description": "Entity Version.",
     "type": "drupal-module",
-    "license": "EUPL-1.2",
+    "license": "GPL-2.0+",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
