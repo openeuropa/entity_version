@@ -56,6 +56,13 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('content_moderation_state');
 
+    // In Drupal 8.8, paths have been moved to an entity type.
+    // @todo remove this when the component will depend on 8.8.
+    if ($this->container->get('entity_type.manager')->hasDefinition('path_alias')) {
+      $this->container->get('module_installer')->install(['path_alias']);
+      $this->installEntitySchema('path_alias');
+    }
+
     $this->installSchema('node', 'node_access');
 
     $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
