@@ -174,6 +174,37 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
   }
 
   /**
+   * Test we can flag entities to not increase the version.
+   */
+  public function testEntityVersionNoIncrease() {
+    $values = [
+      'title' => 'Workflow node',
+      'type' => 'entity_version_workflows_example',
+      'moderation_state' => 'draft',
+    ];
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $this->nodeStorage->create($values);
+    $node->save();
+
+    // There is no default value so all versions should be 0.
+    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertNodeVersion($node, 0, 0, 0);
+
+    // Alter the node to increase the patch number (stay in draft).
+    $node->set('title', 'New title');
+    $node->save();
+    $this->assertNodeVersion($node, 0, 0, 1);
+    $node->save();
+
+    // Alter the node again but flag it to not increase the number.
+    $node->set('title', 'Newer title');
+    $node->entity_version_no_update = TRUE;
+    $node->save();
+    $this->assertNodeVersion($node, 0, 0, 1);
+    $node->save();
+  }
+
+  /**
    * Assert the entity version field value.
    *
    * @param \Drupal\node\NodeInterface $node
