@@ -1,0 +1,6 @@
+entity_version_history.settings:
+  title: 'Entity version history'
+  route_name: entity_version_history.settings
+  parent: entity_version.index
+  description: 'Configure entity version history tab.'
+  weight: 0
