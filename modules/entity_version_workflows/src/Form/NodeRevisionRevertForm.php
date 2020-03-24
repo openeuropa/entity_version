@@ -12,7 +12,7 @@ use Drupal\node\NodeInterface;
 class NodeRevisionRevertForm extends CoreNodeRevisionRevertForm {
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   protected function prepareRevertedRevision(NodeInterface $revision, FormStateInterface $form_state) {
     $revision = parent::prepareRevertedRevision($revision, $form_state);
