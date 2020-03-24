@@ -1,6 +1,6 @@
 # Entity Version Workflows
 
-This module provides an additional functionality to control of version numbers through workflow state transitions.
+This module provides an additional functionality that allows control of version numbers through workflow state transitions.
 
 ## Usage
 
