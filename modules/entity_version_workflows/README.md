@@ -1,6 +1,6 @@
 # Entity Version Workflows
 
-This module provides an additional functionality that allows control of version numbers through workflow state transitions.
+This module provides additional functionality that allows to control version numbers through workflow state transitions.
 
 ## Usage
 
@@ -11,3 +11,7 @@ of the version numbers will increase, decrease or stay the same.
 
 It is possible to flag entities to bypass the configuration and prevent the version number from being altered
 by setting the custom property "entity_version_no_update" to TRUE.
+
+```
+$entity->entity_version_no_update = TRUE;
+```
