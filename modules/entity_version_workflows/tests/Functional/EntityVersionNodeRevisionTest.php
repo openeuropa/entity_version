@@ -42,13 +42,8 @@ class EntityVersionNodeRevisionTest extends BrowserTestBase {
     parent::setUp();
 
     $this->adminUser = $this->drupalCreateUser([
-      'administer workflows',
       'access administration pages',
-      'administer content types',
       'administer nodes',
-      'view latest version',
-      'view any unpublished content',
-      'access content overview',
     ]);
 
     $this->drupalLogin($this->adminUser);
