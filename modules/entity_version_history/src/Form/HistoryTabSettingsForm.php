@@ -112,16 +112,12 @@ class HistoryTabSettingsForm extends FormBase {
 
     asort($entity_labels);
 
-    $form = [
-      '#labels' => $entity_labels,
-    ];
-
     // Create checkboxes for all entity types.
     $form['entity_types'] = [
       '#title' => $this->t('History tab settings'),
       '#type' => 'checkboxes',
       '#options' => $entity_labels,
-      '#default_value' => !empty($history_configs) ? array_keys($history_configs) : [],
+      '#default_value' => is_array($history_configs) ? array_keys($history_configs) : [],
     ];
 
     // Create checkboxes for all bundles.
@@ -135,7 +131,7 @@ class HistoryTabSettingsForm extends FormBase {
             ':input[name="entity_types[' . $entity_type_id . ']"]' => ['checked' => TRUE],
           ],
         ],
-        '#default_value' => !empty($history_configs[$entity_type_id]) ? array_keys($history_configs[$entity_type_id]) : [],
+        '#default_value' => is_array($history_configs[$entity_type_id]) ? array_keys($history_configs[$entity_type_id]) : [],
       ];
 
       // Create select list of the version fields in the bundle.
@@ -150,7 +146,7 @@ class HistoryTabSettingsForm extends FormBase {
               ':input[name="' . $entity_type_id . '[' . $bundle_name . ']"]' => ['checked' => TRUE],
             ],
           ],
-          '#default_value' => !empty($history_configs[$entity_type_id][$bundle_name]) ? array_keys($history_configs[$entity_type_id][$bundle_name]) : [],
+          '#default_value' => is_array($history_configs[$entity_type_id][$bundle_name]) ? array_keys($history_configs[$entity_type_id][$bundle_name]) : [],
         ];
       }
     }
@@ -174,7 +170,7 @@ class HistoryTabSettingsForm extends FormBase {
     foreach ($form_state->getValue('entity_types') as $target_entity_type_id => $entity_id_value) {
       if (!$entity_id_value) {
         // Delete all existing config settings with this entity id if the
-        // entity type checkbox is unchecked in the form.
+        // entity type (top level) checkbox is unchecked in the form.
         if ($configs = HistoryTabSettings::loadByEntityType($target_entity_type_id)) {
           $this->entityTypeManager->getStorage('entity_version_history_settings')->delete($configs);
           continue;
