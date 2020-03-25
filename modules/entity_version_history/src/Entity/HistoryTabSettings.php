@@ -155,6 +155,12 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
     // Create dependency on the bundle.
     $entity_type = \Drupal::entityTypeManager()->getDefinition($this->target_entity_type_id);
     $bundle_config_dependency = $entity_type->getBundleConfigDependency($this->target_bundle);
+
+    if (!empty($this->target_field)) {
+      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->load("$this->target_entity_type_id.$this->target_bundle.$this->target_field");
+      $this->addDependency($field_config->getConfigDependencyKey(), $field_config->getConfigDependencyName());
+    }
+
     $this->addDependency($bundle_config_dependency['type'], $bundle_config_dependency['name']);
 
     return $this;
@@ -188,18 +194,11 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
    *   Array of HistoryTabSettings config entities if there is any.
    */
   public static function loadByEntityType(string $entity_type_id): array {
-    $configs = [];
     if ($entity_type_id === NULL) {
-      return $configs;
+      return [];
     }
 
-    $definition = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
-    $bundles = \Drupal::entityTypeManager()->getStorage($definition->getBundleEntityType())->loadMultiple();
-    foreach ($bundles as $bundle_name => $bundle) {
-      $configs[$entity_type_id . '.' . $bundle_name] = \Drupal::entityTypeManager()->getStorage('entity_version_history_settings')->load($entity_type_id . '.' . $bundle_name);
-    }
-
-    return $configs;
+    return \Drupal::entityTypeManager()->getStorage('entity_version_history_settings')->loadByProperties(['target_entity_type_id' => $entity_type_id]);
   }
 
 }
