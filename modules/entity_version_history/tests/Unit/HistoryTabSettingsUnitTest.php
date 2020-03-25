@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\entity_version_history\Entity\HistoryTabSettings;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -54,7 +55,7 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
   protected $typedConfigManager;
 
   /**
-   * The typed configuration manager used for testing.
+   * The config entity storage used for testing.
    *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorage|\PHPUnit\Framework\MockObject\MockObject
    */
@@ -98,12 +99,49 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       ->with('test_entity_type')
       ->will($this->returnValue($target_entity_type));
 
-    $config = new HistoryTabSettings([
+    $field = new FieldConfig([
+      'field_name' => 'field_test',
+      'entity_type' => 'test_entity_type',
+      'bundle' => 'test_bundle',
+      'field_type' => 'test_field',
+    ]);
+
+    // Mock the field config entity and the dependency methods.
+    $field_config = $this->createMock('\Drupal\field\Entity\FieldConfig');
+    $field_config->expects($this->any())
+      ->method('load')
+      ->with($field->id())
+      ->will($this->returnValue($field));
+    $field_config->expects($this->any())
+      ->method('getConfigDependencyName')
+      ->will($this->returnValue('field.field.test_entity_type.test_field'));
+    $field_config->expects($this->any())
+      ->method('getConfigDependencyKey')
+      ->will($this->returnValue('config'));
+
+    // Mock the field config storage and make sure it returns the field config.
+    $field_config_storage = $this->createMock('\Drupal\field\FieldConfigStorage');
+    $field_config_storage->expects($this->any())
+      ->method('load')
+      ->with($field->id())
+      ->will($this->returnValue($field_config));
+
+    // Make sure we return the mocked field config.
+    $this->entityTypeManager->expects($this->once())
+      ->method('getStorage')
+      ->with('field_config')
+      ->will($this->returnValue($field_config_storage));
+
+    $history_config = new HistoryTabSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
-      'target_field' => 'test_field',
+      'target_field' => $field->getName(),
     ], 'entity_version_history_settings');
-    $dependencies = $config->calculateDependencies()->getDependencies();
+
+    $dependencies = $history_config->calculateDependencies()->getDependencies();
+
+    // Assert that we have the required dependencies for our config entity.
+    $this->assertContains('field.field.test_entity_type.test_field', $dependencies['config']);
     $this->assertContains('test.test_entity_type.id', $dependencies['config']);
   }
 
@@ -167,11 +205,6 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
 
     $this->configEntityStorageInterface
       ->expects($this->any())
-      ->method('create')
-      ->will($this->returnValue($config));
-
-    $this->configEntityStorageInterface
-      ->expects($this->any())
       ->method('load')
       ->with($config->id())
       ->will($this->returnValue($config));
@@ -191,6 +224,47 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
     \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
 
     $loaded_config = HistoryTabSettings::loadByEntityTypeBundle('test_entity_type', 'test_bundle');
+
+    $this->assertSame($config, $loaded_config);
+  }
+
+  /**
+   * @covers ::loadByEntityType()
+   */
+  public function testLoadByEntityType(): void {
+    $config[] = new HistoryTabSettings([
+      'target_entity_type_id' => 'test_entity_type',
+      'target_bundle' => 'test_bundle',
+      'target_field' => 'test_field',
+    ], 'entity_version_history_settings');
+
+    $config[] = new HistoryTabSettings([
+      'target_entity_type_id' => 'test_entity_type',
+      'target_bundle' => 'new_test_bundle',
+      'target_field' => 'new_test_field',
+    ], 'entity_version_history_settings');
+
+    $this->configEntityStorageInterface
+      ->expects($this->any())
+      ->method('loadByProperties')
+      ->with(['target_entity_type_id' => $config[0]->getTargetEntityTypeId()])
+      ->will($this->returnValue($config));
+
+    $this->entityTypeManager
+      ->expects($this->any())
+      ->method('getStorage')
+      ->with('entity_version_history_settings')
+      ->will($this->returnValue($this->configEntityStorageInterface));
+
+    $entity_type_repository = $this->getMockForAbstractClass(EntityTypeRepositoryInterface::class);
+    $entity_type_repository->expects($this->any())
+      ->method('getEntityTypeFromClass')
+      ->with(HistoryTabSettings::class)
+      ->willReturn('entity_version_history_settings');
+
+    \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
+
+    $loaded_config = HistoryTabSettings::loadByEntityType('test_entity_type');
 
     $this->assertSame($config, $loaded_config);
   }
