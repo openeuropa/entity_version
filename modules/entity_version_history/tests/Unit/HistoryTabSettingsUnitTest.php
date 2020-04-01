@@ -6,7 +6,6 @@ namespace Drupal\Tests\entity_version_history\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\entity_version_history\Entity\HistoryTabSettings;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\UnitTestCase;
@@ -62,6 +61,13 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
   protected $configEntityStorageInterface;
 
   /**
+   * The entity field manager for testing.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $entityFieldManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -76,11 +82,14 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
 
     $this->configEntityStorageInterface = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
 
+    $this->entityFieldManager = $this->createMock('Drupal\Core\Entity\EntityFieldManagerInterface');
+
     $container = new ContainerBuilder();
     $container->set('entity_type.manager', $this->entityTypeManager);
     $container->set('uuid', $this->uuid);
     $container->set('config.typed', $this->typedConfigManager);
     $container->set('config.storage', $this->configEntityStorageInterface);
+    $container->set('entity_field.manager', $this->entityFieldManager);
     \Drupal::setContainer($container);
   }
 
@@ -99,14 +108,14 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       ->with('test_entity_type')
       ->will($this->returnValue($target_entity_type));
 
+    // Create a test field config entity and mock the field config entity
+    // and the dependency methods.
     $field = new FieldConfig([
       'field_name' => 'field_test',
       'entity_type' => 'test_entity_type',
       'bundle' => 'test_bundle',
       'field_type' => 'test_field',
     ]);
-
-    // Mock the field config entity and the dependency methods.
     $field_config = $this->createMock('\Drupal\field\Entity\FieldConfig');
     $field_config->expects($this->any())
       ->method('load')
@@ -119,18 +128,11 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       ->method('getConfigDependencyKey')
       ->will($this->returnValue('config'));
 
-    // Mock the field config storage and make sure it returns the field config.
-    $field_config_storage = $this->createMock('\Drupal\field\FieldConfigStorage');
-    $field_config_storage->expects($this->any())
-      ->method('load')
-      ->with($field->id())
-      ->will($this->returnValue($field_config));
-
-    // Make sure we return the mocked field config.
-    $this->entityTypeManager->expects($this->once())
-      ->method('getStorage')
-      ->with('field_config')
-      ->will($this->returnValue($field_config_storage));
+    $field_definitions[$field->getName()] = $field_config;
+    $this->entityFieldManager->expects($this->any())
+      ->method('getFieldDefinitions')
+      ->with('test_entity_type', 'test_bundle')
+      ->will($this->returnValue($field_definitions));
 
     $history_config = new HistoryTabSettings([
       'target_entity_type_id' => 'test_entity_type',
@@ -191,82 +193,6 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       'target_field' => 'test_field',
     ], 'entity_version_history_settings');
     $this->assertSame('test_field', $config->getTargetField());
-  }
-
-  /**
-   * @covers ::loadByEntityTypeBundle()
-   */
-  public function testLoadByEntityTypeBundle(): void {
-    $config = new HistoryTabSettings([
-      'target_entity_type_id' => 'test_entity_type',
-      'target_bundle' => 'test_bundle',
-      'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
-
-    $this->configEntityStorageInterface
-      ->expects($this->any())
-      ->method('load')
-      ->with($config->id())
-      ->will($this->returnValue($config));
-
-    $this->entityTypeManager
-      ->expects($this->any())
-      ->method('getStorage')
-      ->with('entity_version_history_settings')
-      ->will($this->returnValue($this->configEntityStorageInterface));
-
-    $entity_type_repository = $this->getMockForAbstractClass(EntityTypeRepositoryInterface::class);
-    $entity_type_repository->expects($this->any())
-      ->method('getEntityTypeFromClass')
-      ->with(HistoryTabSettings::class)
-      ->willReturn('entity_version_history_settings');
-
-    \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
-
-    $loaded_config = HistoryTabSettings::loadByEntityTypeBundle('test_entity_type', 'test_bundle');
-
-    $this->assertSame($config, $loaded_config);
-  }
-
-  /**
-   * @covers ::loadByEntityType()
-   */
-  public function testLoadByEntityType(): void {
-    $config[] = new HistoryTabSettings([
-      'target_entity_type_id' => 'test_entity_type',
-      'target_bundle' => 'test_bundle',
-      'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
-
-    $config[] = new HistoryTabSettings([
-      'target_entity_type_id' => 'test_entity_type',
-      'target_bundle' => 'new_test_bundle',
-      'target_field' => 'new_test_field',
-    ], 'entity_version_history_settings');
-
-    $this->configEntityStorageInterface
-      ->expects($this->any())
-      ->method('loadByProperties')
-      ->with(['target_entity_type_id' => $config[0]->getTargetEntityTypeId()])
-      ->will($this->returnValue($config));
-
-    $this->entityTypeManager
-      ->expects($this->any())
-      ->method('getStorage')
-      ->with('entity_version_history_settings')
-      ->will($this->returnValue($this->configEntityStorageInterface));
-
-    $entity_type_repository = $this->getMockForAbstractClass(EntityTypeRepositoryInterface::class);
-    $entity_type_repository->expects($this->any())
-      ->method('getEntityTypeFromClass')
-      ->with(HistoryTabSettings::class)
-      ->willReturn('entity_version_history_settings');
-
-    \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
-
-    $loaded_config = HistoryTabSettings::loadByEntityType('test_entity_type');
-
-    $this->assertSame($config, $loaded_config);
   }
 
 }

@@ -15,23 +15,15 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
   use SchemaCheckTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'node',
-    'entity_version',
-    'entity_version_workflows',
-    'entity_version_workflows_example',
-    'entity_version_history',
-    'menu_link_content',
-  ];
-
-  /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected static $modules = [
+    'node',
+    'entity_version',
+    'entity_version_history',
+    'entity_version_history_test',
+    'menu_link_content',
+  ];
 
   /**
    * A user with administrative permissions.
@@ -61,47 +53,65 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->drupalGet('admin/config/entity-version/history-tab');
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
+    $node_entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-node');
+    $node_entity_checkbox->check();
+    $history_entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-history-entity-test');
+    $history_entity_checkbox->check();
 
-    $entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-node');
-    $entity_checkbox->check();
-    $bundle_checkbox = $assert_session->waitForElementVisible('css', '#edit-node-entity-version-workflows-example');
-    $bundle_checkbox->check();
-    $assert_session->waitForElementVisible('css', 'select[name="node-entity_version_workflows_example"]');
+    $first_bundle_checkbox = $assert_session->elementExists('css', '#edit-node-first-bundle');
+    $first_bundle_checkbox->check();
+    $second_bundle_checkbox = $assert_session->elementExists('css', '#edit-node-second-bundle');
+    $second_bundle_checkbox->check();
+    $history_bundle_checkbox = $assert_session->elementExists('css', '#edit-history-entity-test-history-entity-test');
+    $history_bundle_checkbox->check();
     $page->pressButton('Save configuration');
 
-    $this->assertTrue($entity_checkbox->isChecked());
-    $this->assertTrue($bundle_checkbox->isChecked());
+    $status_message = $assert_session->waitForElement('css', '.messages--status');
+    $this->assertEquals($status_message->getText(), 'Status message Configuration has been saved.');
+
+    // Make sure that the settings are reflected in the form.
+    $this->assertTrue($node_entity_checkbox->isChecked());
+    $this->assertTrue($first_bundle_checkbox->isChecked());
+    $this->assertTrue($second_bundle_checkbox->isChecked());
+    $this->assertTrue($history_entity_checkbox->isChecked());
+    $this->assertTrue($history_bundle_checkbox->isChecked());
+
+    // Make sure configuration saved correctly and complies with the schema.
+    $config_data = $this->config('entity_version_history.settings.node.first_bundle');
+    $this->assertEquals($config_data->get('target_entity_type_id'), 'node');
+    $this->assertEquals($config_data->get('target_bundle'), 'first_bundle');
+    $this->assertEquals($config_data->get('target_field'), 'field_entity_version');
+    $this->assertConfigSchema(\Drupal::service('config.typed'), $config_data->getName(), $config_data->get());
+
+    $config_data = $this->config('entity_version_history.settings.node.second_bundle');
+    $this->assertEquals($config_data->get('target_entity_type_id'), 'node');
+    $this->assertEquals($config_data->get('target_bundle'), 'second_bundle');
+    $this->assertEquals($config_data->get('target_field'), 'field_entity_version');
+    $this->assertConfigSchema(\Drupal::service('config.typed'), $config_data->getName(), $config_data->get());
+
+    $config_data = $this->config('entity_version_history.settings.history_entity_test.history_entity_test');
+    $this->assertEquals($config_data->get('target_entity_type_id'), 'history_entity_test');
+    $this->assertEquals($config_data->get('target_bundle'), 'history_entity_test');
+    $this->assertEquals($config_data->get('target_field'), 'version');
+    $this->assertConfigSchema(\Drupal::service('config.typed'), $config_data->getName(), $config_data->get());
 
     // Remove the config by unchecking the entity checkbox.
-    $entity_checkbox->uncheck();
+    $history_bundle_checkbox->uncheck();
     $page->pressButton('Save configuration');
 
-    $this->assertFalse($entity_checkbox->isChecked());
-    $this->assertFalse($bundle_checkbox->isChecked());
-  }
+    // Make sure that the settings are reflected in the form.
+    $this->assertTrue($node_entity_checkbox->isChecked());
+    $this->assertTrue($first_bundle_checkbox->isChecked());
+    $this->assertTrue($second_bundle_checkbox->isChecked());
+    $this->assertFalse($history_entity_checkbox->isChecked());
+    $this->assertFalse($history_bundle_checkbox->isChecked());
 
-  /**
-   * Tests whether the history settings config schema is valid.
-   */
-  public function testValidHistoryTabSettingsSchema() {
-    $this->drupalGet('admin/config/entity-version/history-tab');
-    $page = $this->getSession()->getPage();
-    $assert_session = $this->assertSession();
-
-    $checkbox = $assert_session->elementExists('css', '#edit-entity-types-node');
-    $checkbox->check();
-    $checkbox = $assert_session->waitForElementVisible('css', '#edit-node-entity-version-workflows-example');
-    $checkbox->check();
-    $assert_session->waitForElementVisible('css', 'select[name="node-entity_version_workflows_example"]');
-    $page->pressButton('Save configuration');
-
-    $config_data = $this->config('entity_version_history.settings.node.entity_version_workflows_example');
-    // Make sure configuration saved correctly.
-    $this->assertEquals($config_data->get('target_entity_type_id'), 'node');
-    $this->assertEquals($config_data->get('target_bundle'), 'entity_version_workflows_example');
-    $this->assertEquals($config_data->get('target_field'), 'field_version');
-
-    $this->assertConfigSchema(\Drupal::service('config.typed'), $config_data->getName(), $config_data->get());
+    // Check the config is deleted.
+    $this->container->get('config.factory')->clearStaticCache();
+    $config_data = $this->config('entity_version_history.settings.history_entity_test.history_entity_test');
+    $this->assertNull($config_data->get('target_entity_type_id'), 'history_entity_test');
+    $this->assertNull($config_data->get('target_bundle'), 'history_entity_test');
+    $this->assertNull($config_data->get('target_field'), 'version');
   }
 
 }

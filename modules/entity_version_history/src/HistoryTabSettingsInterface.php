@@ -20,20 +20,23 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
   public function getTargetEntityTypeId(): string;
 
   /**
+   * Sets the entity type this config applies to.
+   *
+   * @param string $target_entity_type_id
+   *   The entity type id.
+   *
+   * @return $this
+   *   Returns the HistoryTabSettings object.
+   */
+  public function setTargetEntityTypeId(string $target_entity_type_id): HistoryTabSettingsInterface;
+
+  /**
    * Gets the bundle this config applies to.
    *
    * @return string
    *   Returns the name of the target bundle.
    */
   public function getTargetBundle(): string;
-
-  /**
-   * Gets the target version field machine name.
-   *
-   * @return string
-   *   Return the target version field machine name.
-   */
-  public function getTargetField(): string;
 
   /**
    * Sets the bundle this config applies to.
@@ -44,7 +47,15 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
    * @return $this
    *   Returns the HistoryTabSettings object.
    */
-  public function setTargetBundle(string $target_bundle): ConfigEntityInterface;
+  public function setTargetBundle(string $target_bundle): HistoryTabSettingsInterface;
+
+  /**
+   * Gets the target version field machine name.
+   *
+   * @return string
+   *   Return the target version field machine name.
+   */
+  public function getTargetField(): string;
 
   /**
    * Sets the target version field to read the versions from.
@@ -55,6 +66,6 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
    * @return $this
    *   Returns the HistoryTabSettings object.
    */
-  public function setTargetField(string $target_field): ConfigEntityInterface;
+  public function setTargetField(string $target_field): HistoryTabSettingsInterface;
 
 }
