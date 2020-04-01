@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Comment module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_uninstall().
+ */
+function entity_version_history_uninstall() {
+  // Remove the existing config entities.
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_version_history_settings');
+  $configs = $storage->loadMultiple();
+  $storage->delete($configs);
+}

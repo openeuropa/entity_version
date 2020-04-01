@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.first_bundle.field_entity_version
+    - node.type.first_bundle
+  module:
+    - entity_version
+    - user
+id: node.first_bundle.default
+targetEntityType: node
+bundle: first_bundle
+mode: default
+content:
+  field_entity_version:
+    type: entity_version
+    weight: 2
+    region: content
+    label: above
+    settings:
+      minimum_category: patch
+    third_party_settings: {  }
+  links:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

@@ -1,4 +1,0 @@
-entity_version_history.settings:
-  title: 'History tab settings'
-  route_name: entity_version_history.settings
-  base_route: entity_version_history.settings
