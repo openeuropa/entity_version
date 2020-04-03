@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -40,6 +41,13 @@ class HistoryTabSettingsForm extends FormBase {
   protected $entityFieldManager;
 
   /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs an HistoryTabSettingsForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -48,11 +56,14 @@ class HistoryTabSettingsForm extends FormBase {
    *   The entity type bundle info manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entityFieldManager, MessengerInterface $messenger) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_bundle_info;
     $this->entityFieldManager = $entityFieldManager;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -62,7 +73,8 @@ class HistoryTabSettingsForm extends FormBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('messenger')
     );
   }
 
@@ -91,8 +103,7 @@ class HistoryTabSettingsForm extends FormBase {
       $definition = $this->entityTypeManager->getDefinition($entity_type_id);
 
       if (!$definition->hasLinkTemplate('canonical')) {
-        // We are only interested in the content entity types has
-        // canonical URL.
+        // We are only interested in entity types that have a canonical URL.
         continue;
       }
 
@@ -121,13 +132,12 @@ class HistoryTabSettingsForm extends FormBase {
 
     $form['description'] = [
       '#type' => 'item',
-      '#markup' => $this->t('Configure the visibility of the History tab by selecting the desired entities and bundles that have a version field.'),
+      '#markup' => $this->t('Configure on which entity type and bundle you would like the Version history tab to show up.'),
     ];
 
     // Create checkboxes for all entity types.
     $form['entity_types'] = [
-      '#title' => $this->t('History tab settings'),
-      '#description' => $this->t('Select entity types to configure History tab.'),
+      '#title' => $this->t('Entity types that have a Version field'),
       '#type' => 'checkboxes',
       '#options' => $entity_labels,
       '#default_value' => is_array($history_configs) ? array_keys($history_configs) : [],
@@ -138,7 +148,7 @@ class HistoryTabSettingsForm extends FormBase {
       $form['settings'][$entity_type_id . '_bundles'] = [
         '#type' => 'details',
         '#title' => $entity_labels[$entity_type_id],
-        '#description' => $this->t('Select the bundles where History tab will be present.'),
+        '#description' => $this->t('The bundles that have a Version field.'),
         '#open' => TRUE,
         '#states' => [
           'visible' => [
@@ -155,18 +165,29 @@ class HistoryTabSettingsForm extends FormBase {
 
       // Create select list of the version fields in the bundle.
       foreach ($bundles as $bundle_name => $label) {
+        $access = TRUE;
+        $default_value = [];
+
+        if (count($field_labels[$entity_type_id][$bundle_name]) === 1) {
+          // Remove access if there is only one version field and
+          // set the default_value for the form field.
+          $access = FALSE;
+          $default_value = key($field_labels[$entity_type_id][$bundle_name]);
+        }
+
         $form['settings'][$entity_type_id . '_bundles'][$entity_type_id . '_' . $bundle_name] = [
-          '#title' => "$label - version fields",
-          '#description' => $this->t('Select the field where the version numbers are stored.'),
+          '#title' => $label,
+          '#description' => $this->t('Select the Version field to use for building the history tab.'),
           '#type' => 'select',
           '#options' => $field_labels[$entity_type_id][$bundle_name],
+          '#access' => $access,
           '#states' => [
             'visible' => [
               ':input[name="entity_types[' . $entity_type_id . ']"]' => ['checked' => TRUE],
               ':input[name="' . $entity_type_id . '[' . $bundle_name . ']"]' => ['checked' => TRUE],
             ],
           ],
-          '#default_value' => is_array($history_configs[$entity_type_id][$bundle_name]) ? array_keys($history_configs[$entity_type_id][$bundle_name]) : [],
+          '#default_value' => is_array($history_configs[$entity_type_id][$bundle_name]) ? key($history_configs[$entity_type_id][$bundle_name]) : $default_value,
         ];
       }
     }
@@ -201,8 +222,8 @@ class HistoryTabSettingsForm extends FormBase {
       foreach ($form_state->getValue($target_entity_type_id) as $target_bundle => $bundle_value) {
         $config = $history_storage->load("$target_entity_type_id.$target_bundle");
         if (!$bundle_value && $config) {
-          // Delete existing config setting with this entity id and bundle
-          // if the bundle checkbox is unchecked in the form.
+          // Delete the existing config entities with this target entity id
+          // and bundle if the bundle checkbox is unchecked in the form.
           $config->delete();
           continue;
         }
@@ -231,7 +252,7 @@ class HistoryTabSettingsForm extends FormBase {
       }
     }
 
-    $this->messenger()->addStatus($this->t('Configuration has been saved.'));
+    $this->messenger->addStatus($this->t('The Version history configuration has been saved.'));
   }
 
 }
