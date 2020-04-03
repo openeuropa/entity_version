@@ -8,10 +8,10 @@ dependencies:
 
 config_devel:
   install:
-    - core.entity_view_display.node.first_bundle.default
-    - core.entity_view_display.node.second_bundle.default
     - field.field.node.first_bundle.field_entity_version
     - field.field.node.second_bundle.field_entity_version
+    - field.field.node.second_bundle.field_secondary_version
     - field.storage.node.field_entity_version
+    - field.storage.node.field_secondary_version
     - node.type.first_bundle
     - node.type.second_bundle

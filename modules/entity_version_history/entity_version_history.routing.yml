@@ -2,6 +2,6 @@ entity_version_history.settings:
   path: '/admin/config/entity-version/history-tab'
   defaults:
     _form: '\Drupal\entity_version_history\Form\HistoryTabSettingsForm'
-    _title: 'History tab settings'
+    _title: 'Version history settings'
   requirements:
     _permission: 'access entity version history configuration'
