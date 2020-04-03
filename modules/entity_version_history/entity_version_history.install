@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the Comment module.
+ * Install and update functions for the entity_version_history module.
  */
 
 declare(strict_types = 1);
