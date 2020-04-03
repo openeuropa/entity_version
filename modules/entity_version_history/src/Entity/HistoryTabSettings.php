@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Drupal\entity_version_history\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\entity_version_history\HistoryTabSettingsInterface;
 use Drupal\field\FieldConfigInterface;
@@ -153,7 +152,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies(): ConfigEntityInterface {
+  public function calculateDependencies(): HistoryTabSettingsInterface {
     parent::calculateDependencies();
 
     // Create dependency on the bundle.
