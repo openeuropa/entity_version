@@ -18,18 +18,15 @@ use Drupal\user\UserInterface;
  *   id = "history_entity_test",
  *   label = @Translation("History test entity"),
  *   base_table = "history_entity_test",
- *   persistent_cache = FALSE,
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
- *     "bundle" = "type",
  *     "label" = "name",
  *     "langcode" = "langcode",
  *   },
  *   links = {
  *     "canonical" = "/history_entity_test/{entity_test}",
  *   },
- *   field_ui_base_route = "entity.history_entity_test.admin_form",
  * )
  */
 class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterface {
@@ -50,21 +47,6 @@ class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterfac
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the test entity.'))
-      ->setTranslatable(TRUE)
-      ->setSetting('max_length', 32)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -5,
-      ]);
-
     $fields['version'] = BaseFieldDefinition::create('entity_version')
       ->setLabel(t('Entity version'))
       ->setDescription(t('Entity version'))
@@ -77,18 +59,9 @@ class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterfac
       ->setSetting('handler', 'default')
       // Defaults to have the root user as the owner, to simplify testing.
       ->setDefaultValue([0 => ['target_id' => 1]])
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => -1,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'placeholder' => '',
-        ],
-      ]);
+      ->setTranslatable(TRUE);
 
-    return $fields + \Drupal::state()->get($entity_type->id() . '.additional_base_field_definitions', []);
+    return $fields;
   }
 
   /**
@@ -119,30 +92,6 @@ class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterfac
   public function setOwner(UserInterface $account) {
     $this->set('user_id', $account->id());
     return $this;
-  }
-
-  /**
-   * Sets the name.
-   *
-   * @param string $name
-   *   Name of the entity.
-   *
-   * @return $this
-   *   The test entity.
-   */
-  public function setName($name): HistoryEntityTest {
-    $this->set('name', $name);
-    return $this;
-  }
-
-  /**
-   * Returns the name.
-   *
-   * @return string
-   *   The name of the test entity.
-   */
-  public function getName(): string {
-    return $this->get('name')->value;
   }
 
 }
