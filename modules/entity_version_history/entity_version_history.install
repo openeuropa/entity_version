@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install and update functions for the entity_version_history module.
+ * Install and update functions for the Entity Version History module.
  */
 
 declare(strict_types = 1);
