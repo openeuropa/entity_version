@@ -14,8 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure the history tab settings per content entity type and bundle.
- *
- * @internal
  */
 class HistoryTabSettingsForm extends FormBase {
 
@@ -122,7 +120,9 @@ class HistoryTabSettingsForm extends FormBase {
           if ($config = $this->entityTypeManager->getStorage('entity_version_history_settings')->load("$entity_type_id.$bundle_name")) {
             // Get the existing configs to pre-fill the form fields with
             // default values.
-            $history_configs[$entity_type_id][$bundle_name][$field_name] = $config->getTargetField();
+            if ($field_name === $config->getTargetField()) {
+              $history_configs[$entity_type_id][$bundle_name][$field_name] = $config->getTargetField();
+            }
           }
         }
       }
@@ -140,7 +140,7 @@ class HistoryTabSettingsForm extends FormBase {
       '#title' => $this->t('Entity types that have a Version field'),
       '#type' => 'checkboxes',
       '#options' => $entity_labels,
-      '#default_value' => is_array($history_configs) ? array_keys($history_configs) : [],
+      '#default_value' => isset($history_configs) ? array_keys($history_configs) : [],
     ];
 
     // Create checkboxes for all bundles.
@@ -160,7 +160,7 @@ class HistoryTabSettingsForm extends FormBase {
         '#title' => $this->t('Bundles'),
         '#type' => 'checkboxes',
         '#options' => $bundles,
-        '#default_value' => is_array($history_configs[$entity_type_id]) ? array_keys($history_configs[$entity_type_id]) : [],
+        '#default_value' => isset($history_configs[$entity_type_id]) ? array_keys($history_configs[$entity_type_id]) : [],
       ];
 
       // Create select list of the version fields in the bundle.
@@ -187,7 +187,7 @@ class HistoryTabSettingsForm extends FormBase {
               ':input[name="' . $entity_type_id . '[' . $bundle_name . ']"]' => ['checked' => TRUE],
             ],
           ],
-          '#default_value' => is_array($history_configs[$entity_type_id][$bundle_name]) ? key($history_configs[$entity_type_id][$bundle_name]) : $default_value,
+          '#default_value' => isset($history_configs[$entity_type_id][$bundle_name]) ? key($history_configs[$entity_type_id][$bundle_name]) : $default_value,
         ];
       }
     }
