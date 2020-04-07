@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\entity_version_history\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 
@@ -66,21 +67,32 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertFalse($second_bundle_checkbox->isVisible());
     $this->assertFalse($history_bundle_checkbox->isVisible());
 
-    // Check the entity type checkboxes.
+    // Check the content entity type checkbox.
     $node_entity_checkbox->check();
-    $history_entity_checkbox->check();
 
-    // Check the bundle checkboxes are now visible.
+    // Check the bundle checkboxes are now visible except the history bundle.
     $this->assertTrue($first_bundle_checkbox->isVisible());
     $this->assertTrue($second_bundle_checkbox->isVisible());
+    $this->assertFalse($history_bundle_checkbox->isVisible());
+
+    // Check the history entity type checkbox.
+    $history_entity_checkbox->check();
+
+    // Check the bundle checkbox is visible for history.
     $this->assertTrue($history_bundle_checkbox->isVisible());
 
     // Check that there is only one select field and it's not visible.
     $selects = $page->findAll('css', 'details select');
-    $this->assertEquals(1, count($selects));
+    $this->assertCount(1, $selects);
     $select = reset($selects);
     $this->assertEquals('node_second_bundle', $select->getAttribute('name'));
     $this->assertFalse($select->isVisible());
+
+    // Assert that the correct options are present in the field.
+    $this->assertFieldSelectOptions('node_second_bundle', [
+      'field_entity_version',
+      'field_secondary_version',
+    ]);
 
     // Check the bundle checkboxes.
     $first_bundle_checkbox->check();
@@ -96,9 +108,9 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertEquals('Status message The Version history configuration has been saved.', $status_message->getText());
 
     // Check that there are only 3 config entities created.
-    $storage = $this->container->get('entity_type.manager')->getStorage('entity_version_history_settings');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('entity_version_history_settings');
     $config_entities = $storage->loadMultiple();
-    $this->assertEquals(3, count($config_entities));
+    $this->assertCount(3, $config_entities);
 
     // Make sure that the settings are reflected in the form and all checked.
     $this->assertTrue($node_entity_checkbox->isChecked());
@@ -157,6 +169,10 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $select->selectOption('Secondary version');
     $page->pressButton('Save configuration');
 
+    // Assert that the correct option is selected.
+    $option_field = $assert_session->optionExists('node_second_bundle', 'field_secondary_version');
+    $this->assertTrue($option_field->hasAttribute('selected'));
+
     // Check the config is updated correctly.
     $this->container->get('config.factory')->clearStaticCache();
     $config = $this->config('entity_version_history.settings.node.second_bundle');
@@ -164,6 +180,32 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertEquals('second_bundle', $config->get('target_bundle'));
     $this->assertEquals('field_secondary_version', $config->get('target_field'));
     $this->assertConfigSchema($this->container->get('config.typed'), $config->getName(), $config->get());
+  }
+
+  /**
+   * Checks if a select element contains the specified options.
+   *
+   * @param string $name
+   *   The field name.
+   * @param array $expected_options
+   *   An array of expected options.
+   */
+  protected function assertFieldSelectOptions(string $name, array $expected_options): void {
+    $xpath = $this->buildXPathQuery('//select[@name=:name]', [':name' => $name]);
+    $fields = $this->xpath($xpath);
+    if ($fields) {
+      $field = $fields[0];
+      $options = $field->findAll('xpath', 'option');
+      array_walk($options, function (NodeElement &$option) {
+        $option = $option->getValue();
+      });
+      sort($options);
+      sort($expected_options);
+      $this->assertIdentical($options, $expected_options);
+    }
+    else {
+      $this->fail('Unable to find field ' . $name);
+    }
   }
 
 }
