@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\entity_version_history\Functional;
 
 use Behat\Mink\Element\NodeElement;
