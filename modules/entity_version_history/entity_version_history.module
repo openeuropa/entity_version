@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types = 1);
+
+/**
+ * @file
+ * Entity version history module.
+ */
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function entity_version_history_entity_type_alter(array &$entity_types) {
+  /** @var $config_factory \Drupal\Core\Config\ConfigFactory */
+  $config_factory = \Drupal::configFactory();
+  $configs = $config_factory->listAll('entity_version_history.settings');
+
+  if (empty($configs)) {
+    return;
+  }
+
+  $configs = $config_factory->loadMultiple($configs);
+
+  foreach ($configs as $config) {
+    $entity_type = $config->get('target_entity_type_id');
+
+    /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+    if ($entity_types[$entity_type]->hasLinkTemplate('drupal:entity-version-history')) {
+      continue;
+    }
+
+    $history_path = $entity_types[$entity_type]->getLinkTemplate('canonical') . '/history';
+    $entity_types[$entity_type]->setLinkTemplate('drupal:entity-version-history', $history_path);
+  }
+}
