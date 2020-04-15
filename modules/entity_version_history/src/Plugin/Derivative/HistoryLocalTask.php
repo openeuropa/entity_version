@@ -5,13 +5,12 @@ declare(strict_types = 1);
 namespace Drupal\entity_version_history\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Deriver class for creating local task links for history tab.
+ * Deriver class for creating local task link for history tab.
  */
 class HistoryLocalTask extends DeriverBase implements ContainerDeriverInterface {
 

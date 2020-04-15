@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_version_history\Controller;
 
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -12,16 +11,10 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Url;
-use Drupal\node\NodeStorageInterface;
-use Drupal\node\NodeTypeInterface;
-use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -44,13 +37,6 @@ class EntityVersionHistoryController extends ControllerBase implements Container
   protected $renderer;
 
   /**
-   * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -58,7 +44,7 @@ class EntityVersionHistoryController extends ControllerBase implements Container
   protected $entityTypeManager;
 
   /**
-   * Constructs a NodeController object.
+   * Constructs a EntityVersionHistoryController object.
    *
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
@@ -66,14 +52,11 @@ class EntityVersionHistoryController extends ControllerBase implements Container
    *   The renderer service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
    */
-  public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
+  public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager) {
     $this->dateFormatter = $date_formatter;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
-    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -83,8 +66,7 @@ class EntityVersionHistoryController extends ControllerBase implements Container
     return new static(
       $container->get('date.formatter'),
       $container->get('renderer'),
-      $container->get('entity_type.manager'),
-      $container->get('entity.repository')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -95,29 +77,45 @@ class EntityVersionHistoryController extends ControllerBase implements Container
    *   The route match.
    *
    * @return array
-   *   An array as expected by \Drupal\Core\Render\RendererInterface::render().
+   *   A render array.
    */
   public function historyOverview(RouteMatchInterface $route_match): array {
+    $entity = $this->getEntityFromRouteMatch($route_match);
 
-    return [];
+    $build['#title'] = $this->t('History for %title', ['%title' => $entity->label()]);
+    $header = [
+      $this->t('Version'),
+      $this->t('Title'),
+      $this->t('Date'),
+      $this->t('Created by'),
+    ];
+
+    $rows = [];
+
+    $build['entity_version_history_table'] = [
+      '#theme' => 'table',
+      '#rows' => $rows,
+      '#header' => $header,
+    ];
+
+    $build['pager'] = ['#type' => 'pager'];
+
+    return $build;
   }
 
   /**
-   * Checks access for to the History route for a given entity.
+   * Checks access to the history route.
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account accessing the route.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The actual route match of the route. This can be different than the
-   *   current one.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The actual route match of the route.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function checkAccess(AccountInterface $account, RouteMatchInterface $routeMatch): AccessResultInterface {
-    $parameters = $routeMatch->getParameters();
-    $entity_type_id = $parameters->keys()[0];
-    $entity = $parameters->get($entity_type_id);
+  public function checkAccess(AccountInterface $account, RouteMatchInterface $route_match): AccessResultInterface {
+    $entity = $this->getEntityFromRouteMatch($route_match);
     $cache = new CacheableMetadata();
     $cache->addCacheContexts(['url']);
 
@@ -126,14 +124,15 @@ class EntityVersionHistoryController extends ControllerBase implements Container
     }
 
     $cache->addCacheableDependency($entity);
-
     $bundle = $entity->bundle();
     $history_storage = $this->entityTypeManager->getStorage('entity_version_history_settings');
-    if (!$config = $history_storage->load("$entity_type_id.$bundle")){
-      return AccessResult::forbidden('Insufficient permission to access the history tab.')->addCacheableDependency($cache);
+    $cache->addCacheTags($history_storage->getEntityType()->getListCacheTags());
+
+    if (!$config_entity = $history_storage->load($entity->getEntityTypeId() . '.' . $bundle)) {
+      return AccessResult::forbidden('No history settings found for this entity type and bundle.')->addCacheableDependency($cache);
     }
 
-    $cache->addCacheableDependency($config);
+    $cache->addCacheableDependency($config_entity);
     $cache->addCacheContexts(['user.permissions']);
     $cache->addCacheableDependency($account);
 
@@ -145,24 +144,30 @@ class EntityVersionHistoryController extends ControllerBase implements Container
   }
 
   /**
-   * Gets a list of revision IDs for a specific content entity.
+   * Returns the current entity from the current route match.
    *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node entity.
-   * @param \Drupal\node\NodeStorageInterface $node_storage
-   *   The node storage handler.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
    *
-   * @return int[]
-   *   Node revision IDs (in descending order).
+   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   *   The entity or NULL if none exists.
    */
-  protected function getRevisionIds(NodeInterface $node, NodeStorageInterface $node_storage) {
-    $result = $node_storage->getQuery()
-      ->allRevisions()
-      ->condition($node->getEntityType()->getKey('id'), $node->id())
-      ->sort($node->getEntityType()->getKey('revision'), 'DESC')
-      ->pager(50)
-      ->execute();
-    return array_keys($result);
+  protected function getEntityFromRouteMatch(RouteMatchInterface $route_match): ?ContentEntityInterface {
+    $route = $route_match->getRouteObject();
+    if (!$route || !$parameters = $route->getOption('parameters')) {
+      return NULL;
+    }
+
+    foreach ($parameters as $name => $options) {
+      if (isset($options['type']) && strpos($options['type'], 'entity:') === 0) {
+        $entity = $route_match->getParameter($name);
+        if ($entity instanceof ContentEntityInterface) {
+          return $entity;
+        }
+      }
+    }
+
+    return NULL;
   }
 
 }
