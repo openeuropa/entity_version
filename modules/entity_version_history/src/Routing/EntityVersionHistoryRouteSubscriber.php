@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
 class EntityVersionHistoryRouteSubscriber extends RouteSubscriberBase {
 
   /**
-   * The content translation manager.
+   * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
@@ -46,12 +46,13 @@ class EntityVersionHistoryRouteSubscriber extends RouteSubscriberBase {
         $entity_type->getLinkTemplate('drupal:entity-version-history'),
         [
           '_controller' => '\Drupal\entity_version_history\Controller\EntityVersionHistoryController::historyOverview',
-          '_title' => 'History',
+          '_title_callback' => '\Drupal\entity_version_history\Controller\EntityVersionHistoryController::title',
         ],
         [
           '_custom_access' => EntityVersionHistoryController::class . '::checkAccess',
         ],
         [
+          '_entity_type_id' => $entity_type_id,
           '_admin_route' => TRUE,
           'parameters' => [
             $entity_type_id => [
