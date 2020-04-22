@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 
 /**
- * Tests the entity version history tab.
+ * Tests the entity version history local task.
  *
  * @group entity_version_history
  */
@@ -41,7 +41,10 @@ class HistoryTabTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
     $this->installEntitySchema('entity_version_history_settings');
+    $this->installSchema('system', 'sequences');
+    $this->installSchema('node', 'node_access');
 
     $this->installConfig([
       'user',
@@ -55,8 +58,7 @@ class HistoryTabTest extends KernelTestBase {
 
     // Create a history tab setting for the corresponding entity type
     // and bundle.
-    $history_storage = $this->container->get('entity_type.manager')
-      ->getStorage('entity_version_history_settings');
+    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_history_settings');
     $history_storage->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'first_bundle',
@@ -67,42 +69,48 @@ class HistoryTabTest extends KernelTestBase {
   }
 
   /**
-   * Tests that the History tab is correctly applied.
+   * Tests the History routes.
    */
-  public function testHistoryTabApplied(): void {
+  public function testHistoryRoutes(): void {
     $route_provider = $this->container->get('router.route_provider');
+    $local_task_manager = $this->container->get('plugin.manager.menu.local_task');
 
     /** @var \Drupal\Core\Entity\EntityTypeInterface $definition */
     foreach ($this->container->get('entity_type.manager')->getDefinitions() as $definition) {
       if ($definition->id() === 'node') {
         $this->assertTrue($definition->hasLinkTemplate('drupal:entity-version-history'));
         $this->assertInstanceOf(Route::class, $route_provider->getRouteByName('entity.' . $definition->id() . '.history'));
+        $history_local_task = $local_task_manager->getDefinition('entity_version_history.entity.history:' . $definition->id());
+        $this->assertEquals('entity.' . $definition->id() . '.history', $history_local_task['route_name']);
+        $this->assertEquals('entity.' . $definition->id() . '.canonical', $history_local_task['base_route']);
+
         continue;
       }
 
       $this->assertFalse($definition->hasLinkTemplate('drupal:entity-version-history'));
+
+      $exception = NULL;
       try {
         $route_provider->getRouteByName('entity.' . $definition->id() . '.history');
       }
-      catch (\Exception $exception) {
-        $this->assertInstanceOf(RouteNotFoundException::class, $exception);
+      catch (\Exception $e) {
+        $exception = $e;
       }
+      $this->assertInstanceOf(RouteNotFoundException::class, $exception);
     }
   }
 
   /**
-   * Tests access to the history tab.
+   * Tests access to the entity version history page.
    */
-  public function testHistoryTabAccess(): void {
-    $this->installEntitySchema('user');
-    // Define the anonymous user first.
+  public function testHistoryPageAccess(): void {
+    // Define the anonymous user first. User id with 0 has to exist in order
+    // to avoid "ContextException: The 'entity:user' context is required and
+    // not present" error.
     User::create([
       'name' => 'Anonymous',
       'uid' => 0,
     ])->save();
-
-    $this->installSchema('system', 'sequences');
-    $this->installSchema('node', 'node_access');
 
     $entity_type_manager = $this->container->get('entity_type.manager');
 
@@ -112,20 +120,8 @@ class HistoryTabTest extends KernelTestBase {
     ]);
     $node->save();
 
-    /** @var \Drupal\user\RoleInterface $role_storage */
-    $role_storage = $this->container->get('entity_type.manager')->getStorage('user_role');
-    $role = $role_storage->create(['id' => 'test_role']);
-    $role->save();
-
-    /** @var \Drupal\user\UserInterface $user */
-    $user = User::create([
-      'name' => 'Test user',
-      'uid' => 2,
-      'roles' => [
-        'test_role',
-      ],
-    ]);
-    $user->save();
+    $user_with_permission = $this->createUser(['access entity version history']);
+    $user_without_permission = $this->createUser();
 
     $history_url = Url::fromRoute('entity.node.history', [
       'node' => $node->id(),
@@ -133,22 +129,19 @@ class HistoryTabTest extends KernelTestBase {
 
     // Assert that we can't access the history page when no permissions are
     // assigned.
-    $this->assertFalse($history_url->access($user));
+    $this->assertFalse($history_url->access($user_without_permission));
 
-    // Assign the required permission.
-    $this->grantPermissions($role, ['access history tab']);
+    // A user with permissions can access the history page.
+    $this->assertTrue($history_url->access($user_with_permission));
 
-    // A user with the permission can access the history page.
-    $this->assertTrue($history_url->access($user));
-
-    // We can't access the history tab without a corresponding
-    // history tab configuration.
+    // We can't access the history page without a corresponding
+    // history settings.
     $entity_type_manager
       ->getStorage('entity_version_history_settings')
       ->load('node.first_bundle')
       ->delete();
 
-    $this->assertFalse($history_url->access($user));
+    $this->assertFalse($history_url->access($user_with_permission));
   }
 
 }
