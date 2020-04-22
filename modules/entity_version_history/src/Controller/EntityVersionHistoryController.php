@@ -9,7 +9,6 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
@@ -18,9 +17,9 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Builds version history table.
+ * Builds the version history table.
  */
-class EntityVersionHistoryController extends ControllerBase implements ContainerInjectionInterface {
+class EntityVersionHistoryController extends ControllerBase {
 
   /**
    * The date formatter service.
@@ -80,9 +79,6 @@ class EntityVersionHistoryController extends ControllerBase implements Container
    *   A render array.
    */
   public function historyOverview(RouteMatchInterface $route_match): array {
-    $entity = $this->getEntityFromRouteMatch($route_match);
-
-    $build['#title'] = $this->t('History for %title', ['%title' => $entity->label()]);
     $header = [
       $this->t('Version'),
       $this->t('Title'),
@@ -117,7 +113,7 @@ class EntityVersionHistoryController extends ControllerBase implements Container
   public function checkAccess(AccountInterface $account, RouteMatchInterface $route_match): AccessResultInterface {
     $entity = $this->getEntityFromRouteMatch($route_match);
     $cache = new CacheableMetadata();
-    $cache->addCacheContexts(['url']);
+    $cache->addCacheContexts(['route']);
 
     if (!$entity) {
       return AccessResult::forbidden('No entity found in the route.')->addCacheableDependency($cache);
@@ -134,17 +130,33 @@ class EntityVersionHistoryController extends ControllerBase implements Container
 
     $cache->addCacheableDependency($config_entity);
     $cache->addCacheContexts(['user.permissions']);
-    $cache->addCacheableDependency($account);
 
-    if (!$account->hasPermission('access history tab')) {
-      return AccessResult::forbidden('Insufficient permission to access the history tab.')->addCacheableDependency($cache);
+    if (!$account->hasPermission('access entity version history')) {
+      return AccessResult::forbidden('Insufficient permissions to access the entity version history page.')->addCacheableDependency($cache);
     }
 
     return AccessResult::allowed()->addCacheableDependency($cache);
   }
 
   /**
-   * Returns the current entity from the current route match.
+   * Provides a title callback for the history page.
+   *
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
+   *
+   * @return string
+   *   The title for the history page.
+   */
+  public function title(RouteMatchInterface $route_match): string {
+    if ($entity = $this->getEntityFromRouteMatch($route_match)) {
+      return sprintf('History for %s', $entity->label());
+    }
+
+    return 'History';
+  }
+
+  /**
+   * Returns the current entity from a given route match.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
@@ -154,20 +166,15 @@ class EntityVersionHistoryController extends ControllerBase implements Container
    */
   protected function getEntityFromRouteMatch(RouteMatchInterface $route_match): ?ContentEntityInterface {
     $route = $route_match->getRouteObject();
-    if (!$route || !$parameters = $route->getOption('parameters')) {
+    if (!$route || !$route->getOption('parameters')) {
       return NULL;
     }
 
-    foreach ($parameters as $name => $options) {
-      if (isset($options['type']) && strpos($options['type'], 'entity:') === 0) {
-        $entity = $route_match->getParameter($name);
-        if ($entity instanceof ContentEntityInterface) {
-          return $entity;
-        }
-      }
+    if (!$entity_type_id = $route->getOption('_entity_type_id')) {
+      return NULL;
     }
 
-    return NULL;
+    return $route_match->getParameter($entity_type_id);
   }
 
 }

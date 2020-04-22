@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Deriver class for creating local task link for history tab.
+ * Deriver class for creating local task links for history tab.
  */
 class HistoryLocalTask extends DeriverBase implements ContainerDeriverInterface {
 
