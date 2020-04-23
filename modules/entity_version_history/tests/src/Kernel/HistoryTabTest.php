@@ -127,21 +127,54 @@ class HistoryTabTest extends KernelTestBase {
       'node' => $node->id(),
     ]);
 
+    /** @var \Drupal\Core\Access\AccessManager $access_manager */
+    $access_manager = $this->container->get('access_manager');
+    $cache_contexts = [
+      'route',
+      'user.permissions',
+    ];
+    $cache_tags = [
+      'config:entity_version_history.settings.' . $node->getEntityTypeId() . '.' . $node->bundle(),
+      'config:entity_version_history_settings_list',
+      $node->getEntityTypeId() . ':' . $node->id(),
+    ];
+
     // Assert that we can't access the history page when no permissions are
     // assigned.
-    $this->assertFalse($history_url->access($user_without_permission));
+    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_without_permission, TRUE);
+    $this->assertTrue($access_result->isForbidden());
+    $this->assertEquals('Insufficient permissions to access the entity version history page.', $access_result->getReason());
+    $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
+    $this->assertEquals($cache_tags, $access_result->getCacheTags());
 
     // A user with permissions can access the history page.
-    $this->assertTrue($history_url->access($user_with_permission));
+    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_with_permission, TRUE);
+    $this->assertTrue($access_result->isAllowed());
+    $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
+    $this->assertEquals($cache_tags, $access_result->getCacheTags());
 
-    // We can't access the history page without a corresponding
-    // history settings.
+    // Remove the corresponding history config.
     $entity_type_manager
       ->getStorage('entity_version_history_settings')
       ->load('node.first_bundle')
       ->delete();
 
-    $this->assertFalse($history_url->access($user_with_permission));
+    // The cache will be different since the config won't be there anymore.
+    $cache_contexts = [
+      'route',
+    ];
+    $cache_tags = [
+      'config:entity_version_history_settings_list',
+      $node->getEntityTypeId() . ':' . $node->id(),
+    ];
+
+    // We can't access the history page without a corresponding
+    // history config.
+    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_with_permission, TRUE);
+    $this->assertTrue($access_result->isForbidden());
+    $this->assertEquals('No history settings found for this entity type and bundle.', $access_result->getReason());
+    $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
+    $this->assertEquals($cache_tags, $access_result->getCacheTags());
   }
 
 }
