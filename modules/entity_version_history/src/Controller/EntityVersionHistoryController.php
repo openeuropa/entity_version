@@ -8,12 +8,12 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,19 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityVersionHistoryController extends ControllerBase {
 
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
+  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -45,16 +33,10 @@ class EntityVersionHistoryController extends ControllerBase {
   /**
    * Constructs a EntityVersionHistoryController object.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager) {
-    $this->dateFormatter = $date_formatter;
-    $this->renderer = $renderer;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -63,8 +45,6 @@ class EntityVersionHistoryController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('date.formatter'),
-      $container->get('renderer'),
       $container->get('entity_type.manager')
     );
   }
@@ -144,15 +124,15 @@ class EntityVersionHistoryController extends ControllerBase {
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The title for the history page.
    */
-  public function title(RouteMatchInterface $route_match): string {
+  public function title(RouteMatchInterface $route_match): TranslatableMarkup {
     if ($entity = $this->getEntityFromRouteMatch($route_match)) {
-      return sprintf('History for %s', $entity->label());
+      return $this->t('History for @entity', ['@entity' => $entity->label()]);
     }
 
-    return 'History';
+    return $this->t('History');
   }
 
   /**
@@ -166,10 +146,6 @@ class EntityVersionHistoryController extends ControllerBase {
    */
   protected function getEntityFromRouteMatch(RouteMatchInterface $route_match): ?ContentEntityInterface {
     $route = $route_match->getRouteObject();
-    if (!$route || !$route->getOption('parameters')) {
-      return NULL;
-    }
-
     if (!$entity_type_id = $route->getOption('_entity_type_id')) {
       return NULL;
     }
