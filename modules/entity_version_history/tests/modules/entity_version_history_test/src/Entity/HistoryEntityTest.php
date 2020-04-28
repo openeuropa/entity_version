@@ -18,8 +18,11 @@ use Drupal\user\UserInterface;
  *   id = "history_entity_test",
  *   label = @Translation("History test entity"),
  *   base_table = "history_entity_test",
+ *   revision_table = "history_entity_test_revision",
+ *   show_revision_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
+ *     "revision" = "revision_id",
  *     "uuid" = "uuid",
  *     "label" = "name",
  *     "langcode" = "langcode",
@@ -50,7 +53,8 @@ class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterfac
     $fields['version'] = BaseFieldDefinition::create('entity_version')
       ->setLabel(t('Entity version'))
       ->setDescription(t('Entity version'))
-      ->setTranslatable(FALSE);
+      ->setTranslatable(FALSE)
+      ->setRevisionable(TRUE);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
@@ -59,7 +63,8 @@ class HistoryEntityTest extends ContentEntityBase implements EntityOwnerInterfac
       ->setSetting('handler', 'default')
       // Defaults to have the root user as the owner, to simplify testing.
       ->setDefaultValue([0 => ['target_id' => 1]])
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE);
 
     return $fields;
   }
