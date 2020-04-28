@@ -264,6 +264,8 @@ class HistoryTabSettingsForm extends FormBase {
       }
     }
 
+    // We need to invalidate cache because in our route subscriber and our
+    // entity type alter we are depending on these configs we create.
     $this->entityTypeManager->clearCachedDefinitions();
     $this->routeBuilder->rebuild();
 
