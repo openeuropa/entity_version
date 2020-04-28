@@ -117,6 +117,11 @@ class HistoryTabSettingsForm extends FormBase {
         continue;
       }
 
+      if (!$definition->isRevisionable()) {
+        // We are only interested in entity types that can have revisions.
+        continue;
+      }
+
       // We need a list of options with labels for the form checkboxes.
       $entity_labels[$entity_type_id] = $definition->getLabel() ?: $entity_type_id;
 
