@@ -12,7 +12,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Builds the version history table.
  */
 class EntityVersionHistoryController extends ControllerBase {
-
-  use StringTranslationTrait;
 
   /**
    * The entity type manager.

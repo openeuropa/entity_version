@@ -45,8 +45,8 @@ class EntityVersionHistoryRouteSubscriber extends RouteSubscriberBase {
       $route = new Route(
         $entity_type->getLinkTemplate('drupal:entity-version-history'),
         [
-          '_controller' => '\Drupal\entity_version_history\Controller\EntityVersionHistoryController::historyOverview',
-          '_title_callback' => '\Drupal\entity_version_history\Controller\EntityVersionHistoryController::title',
+          '_controller' => EntityVersionHistoryController::class . '::historyOverview',
+          '_title_callback' => EntityVersionHistoryController::class . '::title',
         ],
         [
           '_custom_access' => EntityVersionHistoryController::class . '::checkAccess',
