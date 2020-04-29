@@ -107,15 +107,17 @@ class EntityVersionHistoryController extends ControllerBase {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
       $revision = $entity_storage->loadRevision($vid);
       // Only show revisions that are affected by the language that is being
-      // displayed.
+      // displayed at the moment.
       if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
+        $version = $revision->get($version_field)->getValue();
+        $version = reset($version);
+
+        $date = $this->dateFormatter->format($revision->get('revision_timestamp')->value, 'short');
+
         $username = [
           '#theme' => 'username',
           '#account' => $revision->getRevisionUser(),
         ];
-
-        // Use revision link to link to revisions that are not active.
-        $date = $this->dateFormatter->format($revision->get('revision_timestamp')->value, 'short');
 
         // We treat also the latest translation-affecting revision as current
         // revision, if it was the default revision, as its values for the
@@ -130,9 +132,7 @@ class EntityVersionHistoryController extends ControllerBase {
           $current_revision_displayed = TRUE;
         }
 
-        $version = $revision->get($version_field)->getValue();
-        $version = reset($version);
-
+        // Populate the rows of the table with the data.
         $rows[] = [
           'data' => [
             implode('.', $version),
@@ -150,13 +150,13 @@ class EntityVersionHistoryController extends ControllerBase {
       '#rows' => $rows,
     ];
 
+    $build['pager'] = ['#type' => 'pager'];
+
     // Allow the alteration of history table render array through an event.
     $event = new HistoryOverviewAlterEvent();
     $event->setHistoryTable($build['entity_version_history_table']);
     $this->eventDispatcher->dispatch(HistoryOverviewAlterEvent::EVENT, $event);
     $build['entity_version_history_table'] = $event->getHistoryTable();
-
-    $build['pager'] = ['#type' => 'pager'];
 
     return $build;
   }
@@ -246,13 +246,14 @@ class EntityVersionHistoryController extends ControllerBase {
    * @return int[]
    *   Revision IDs (in descending order).
    */
-  protected function getRevisionIds(ContentEntityInterface $entity, EntityStorageInterface $storage) {
+  protected function getRevisionIds(ContentEntityInterface $entity, EntityStorageInterface $storage): array {
     $result = $storage->getQuery()
       ->allRevisions()
       ->condition($entity->getEntityType()->getKey('id'), $entity->id())
       ->sort($entity->getEntityType()->getKey('revision'), 'DESC')
       ->pager(50)
       ->execute();
+
     return array_keys($result);
   }
 
