@@ -42,7 +42,7 @@ class TestHistoryOverviewAlterEventSubscriber implements EventSubscriberInterfac
   }
 
   /**
-   * Alters the history overview table and removes the user column.
+   * Alters the history overview table and removes the "Created by" column.
    *
    * @param \Drupal\entity_version_history\Event\HistoryOverviewAlterEvent $event
    *   The event.
@@ -54,7 +54,7 @@ class TestHistoryOverviewAlterEventSubscriber implements EventSubscriberInterfac
 
     $history_table = $event->getHistoryTable();
 
-    // Unset the last column with the revision user.
+    // Unset the last column with the revision author.
     unset($history_table['#header'][3]);
 
     $rows = [];
