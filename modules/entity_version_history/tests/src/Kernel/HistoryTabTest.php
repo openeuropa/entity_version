@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_version_history\Kernel;
 
-use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
@@ -122,10 +121,6 @@ class HistoryTabTest extends KernelTestBase {
 
     $user_with_permission = $this->createUser(['access entity version history']);
     $user_without_permission = $this->createUser();
-
-    $history_url = Url::fromRoute('entity.node.history', [
-      'node' => $node->id(),
-    ]);
 
     /** @var \Drupal\Core\Access\AccessManager $access_manager */
     $access_manager = $this->container->get('access_manager');
