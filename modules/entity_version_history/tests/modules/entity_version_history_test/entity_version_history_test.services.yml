@@ -1,0 +1,6 @@
+services:
+  entity_version_history_test.event_subscriber.test_alter_table:
+    arguments: ['@state']
+    class: Drupal\entity_version_history_test\EventSubscriber\TestHistoryOverviewAlterEventSubscriber
+    tags:
+      - { name: event_subscriber }
