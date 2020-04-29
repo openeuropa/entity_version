@@ -15,7 +15,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_version_history\Event\HistoryOverviewAlterEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Builds the version history table.
@@ -37,16 +39,26 @@ class EntityVersionHistoryController extends ControllerBase {
   protected $dateFormatter;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a EntityVersionHistoryController object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, EventDispatcherInterface $event_dispatcher) {
     $this->entityTypeManager = $entity_type_manager;
     $this->dateFormatter = $date_formatter;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -55,7 +67,8 @@ class EntityVersionHistoryController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -82,11 +95,13 @@ class EntityVersionHistoryController extends ControllerBase {
     $langcode = $entity->language()->getId();
     $entity_type_id = $entity->getEntityTypeId();
     $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
+    $default_revision = $entity->getRevisionId();
+    $current_revision_displayed = FALSE;
+
+    // Get the version field name from the corresponding history config.
     $history_storage = $this->entityTypeManager->getStorage('entity_version_history_settings');
     $history_setting = $history_storage->load($entity_type_id . '.' . $entity->bundle());
     $version_field = $history_setting->getTargetField();
-    $default_revision = $entity->getRevisionId();
-    $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($entity, $entity_storage) as $vid) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
@@ -134,6 +149,12 @@ class EntityVersionHistoryController extends ControllerBase {
       '#header' => $header,
       '#rows' => $rows,
     ];
+
+    // Allow the alteration of history table render array through an event.
+    $event = new HistoryOverviewAlterEvent();
+    $event->setHistoryTable($build['entity_version_history_table']);
+    $this->eventDispatcher->dispatch(HistoryOverviewAlterEvent::EVENT, $event);
+    $build['entity_version_history_table'] = $event->getHistoryTable();
 
     $build['pager'] = ['#type' => 'pager'];
 
