@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Event;
  * Dispatched by EntityVersionHistoryController::historyOverview().
  *
  * Allows to alter the render array of the history table after it has been
- * populated with data.
+ * populated with data but before it's being rendered.
  */
 class HistoryOverviewAlterEvent extends Event {
 
@@ -24,7 +24,7 @@ class HistoryOverviewAlterEvent extends Event {
   protected $historyTable;
 
   /**
-   * Sets the history table array.
+   * Sets the history table render array.
    *
    * @param array $table
    *   The history table render array.
