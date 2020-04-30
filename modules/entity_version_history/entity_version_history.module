@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Implements hook_entity_type_alter().
  */
@@ -32,4 +34,14 @@ function entity_version_history_entity_type_alter(array &$entity_types) {
     $history_path = $entity_types[$entity_type]->getLinkTemplate('canonical') . '/history';
     $entity_types[$entity_type]->setLinkTemplate('drupal:entity-version-history', $history_path);
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function entity_version_history_entity_version_history_settings_insert(EntityInterface $entity) {
+  // We need to invalidate cache because in our route subscriber and our
+  // entity type alter we are depending on these config entities.
+  \Drupal::service('router.builder')->rebuild();
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
 }
