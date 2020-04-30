@@ -102,6 +102,7 @@ class EntityVersionHistoryController extends ControllerBase {
     $history_storage = $this->entityTypeManager->getStorage('entity_version_history_settings');
     $history_setting = $history_storage->load($entity_type_id . '.' . $entity->bundle());
     $version_field = $history_setting->getTargetField();
+    $revision_timestamp_field = $this->entityTypeManager->getDefinition($entity_type_id)->getRevisionMetadataKeys()['revision_created'];
 
     foreach ($this->getRevisionIds($entity, $entity_storage) as $vid) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
@@ -109,10 +110,13 @@ class EntityVersionHistoryController extends ControllerBase {
       // Only show revisions that are affected by the language that is being
       // displayed at the moment.
       if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
-        $version = $revision->get($version_field)->getValue();
-        $version = reset($version);
+        $version = $this->t('No version set.');
+        if (!$revision->get($version_field)->isEmpty()) {
+          $version = $revision->get($version_field)->getValue();
+          $version = reset($version);
+        }
 
-        $date = $this->dateFormatter->format($revision->get('revision_timestamp')->value, 'short');
+        $date = $this->dateFormatter->format($revision->get($revision_timestamp_field)->value, 'short');
 
         $username = [
           '#theme' => 'username',
