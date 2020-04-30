@@ -6,7 +6,6 @@ namespace Drupal\Tests\entity_version_history\Functional;
 
 use Drupal\entity_version_history_test\EventSubscriber\TestHistoryOverviewAlterEventSubscriber;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\node\Entity\Node;
 
 /**
  * Tests the history overview table.
@@ -20,7 +19,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
    *
    * @var \Drupal\node\NodeInterface[]
    */
-  protected $nodes;
+  protected $revisions;
 
   /**
    * A user with administrative permissions.
@@ -77,8 +76,8 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $node->save();
 
     // Get original node.
-    $nodes = [];
-    $nodes[] = clone $node;
+    $revisions = [];
+    $revisions[] = clone $node;
 
     // Create five revisions.
     $revision_count = 5;
@@ -105,21 +104,20 @@ class HistoryOverviewTest extends WebDriverTestBase {
       $node->save();
 
       // Get each revision.
-      $node = Node::load($node->id());
-      $nodes[] = clone $node;
+      $revisions[] = clone $node;
     }
 
-    $this->nodes = $nodes;
+    $this->revisions = $revisions;
   }
 
   /**
    * Tests the history overview table on the page.
    */
   public function testHistoryOverviewTable(): void {
-    $nodes = $this->nodes;
+    $revisions = $this->revisions;
 
-    // Get last node.
-    $node = $nodes[5];
+    // Get last revision.
+    $node = $revisions[5];
 
     $this->drupalGet('node/' . $node->id() . '/history');
 
@@ -146,14 +144,14 @@ class HistoryOverviewTest extends WebDriverTestBase {
       $version_number = 5 - $i;
       $row_html = $table_rows[$i]->getHtml();
 
-      // Check for the version number is there.
+      // Check that the version number is there.
       $this->assertContains($version_number . '.' . $version_number . '.' . $version_number, $row_html);
 
       // Check for the date.
-      $this->assertContains($date_formatter->format($nodes[$i]->get('revision_timestamp')->value, 'short'), $row_html);
+      $this->assertContains($date_formatter->format($revisions[$i]->get('revision_timestamp')->value, 'short'), $row_html);
 
       // Original author, and editor names should appear.
-      $user = $nodes[$version_number]->revision_uid->entity;
+      $user = $revisions[$version_number]->revision_uid->entity;
       $this->assertContains($user->getAccountName(), $row_html);
 
       // Check for the correct titles with the correct links.
@@ -167,14 +165,14 @@ class HistoryOverviewTest extends WebDriverTestBase {
         case 0:
           // The original node did not have the version number in it's title.
           $this->assertContains('My test node', $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $nodes[$version_number]->getRevisionId() . '/view', $row_html);
+          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$version_number]->getRevisionId() . '/view', $row_html);
           break;
 
         default:
           // Revision titles contain the version number with a link to
           // the revision.
           $this->assertContains('My test node ' . $version_number, $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $nodes[$version_number]->getRevisionId() . '/view', $row_html);
+          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$version_number]->getRevisionId() . '/view', $row_html);
           break;
       }
     }
@@ -190,9 +188,9 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $this->assertNotContains('Created by', $page->find('css', 'thead')->getText());
 
     // Assert the user names are not displayed anywhere in the page.
-    $admin_user = $nodes[0]->revision_uid->entity;
+    $admin_user = $revisions[0]->revision_uid->entity;
     $this->assertNotContains($admin_user->getAccountName(), $page->getText());
-    $editor_user = $nodes[2]->revision_uid->entity;
+    $editor_user = $revisions[2]->revision_uid->entity;
     $this->assertNotContains($editor_user->getAccountName(), $page->getText());
   }
 

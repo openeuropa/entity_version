@@ -27,6 +27,11 @@ use Drupal\user\UserInterface;
  *     "label" = "name",
  *     "langcode" = "langcode",
  *   },
+ *   revision_metadata_keys = {
+ *     "revision_user" = "revision_uid",
+ *     "revision_created" = "revision_timestamp",
+ *     "revision_log_message" = "revision_log"
+ *   },
  *   links = {
  *     "canonical" = "/history_entity_test/{entity_test}",
  *   },
