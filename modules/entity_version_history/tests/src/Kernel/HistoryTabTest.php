@@ -63,8 +63,6 @@ class HistoryTabTest extends KernelTestBase {
       'target_bundle' => 'first_bundle',
       'target_field' => 'field_entity_version',
     ])->save();
-
-    $this->container->get('entity_type.manager')->clearCachedDefinitions();
   }
 
   /**
