@@ -69,17 +69,15 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $entity_type_manager->clearCachedDefinitions();
     $this->container->get('router.builder')->rebuild();
 
+    /** @var \Drupal\node\Entity\Node $node */
     $node = $entity_type_manager->getStorage('node')->create([
       'type' => 'first_bundle',
       'title' => 'My test node',
     ]);
     $node->save();
 
-    // Get original node.
-    $revisions = [];
-    $revisions[] = clone $node;
-
     // Create five revisions.
+    $revision_ids[] = $node->getRevisionId();
     $revision_count = 5;
     for ($i = 0; $i < $revision_count; $i++) {
       $version_number = $i + 1;
@@ -102,12 +100,10 @@ class HistoryOverviewTest extends WebDriverTestBase {
       }
 
       $node->save();
-
-      // Get each revision.
-      $revisions[] = clone $node;
+      $revision_ids[] = $node->getRevisionId();
     }
 
-    $this->revisions = $revisions;
+    $this->revisions = $entity_type_manager->getStorage('node')->loadMultipleRevisions($revision_ids);
   }
 
   /**
@@ -117,7 +113,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $revisions = $this->revisions;
 
     // Get last revision.
-    $node = $revisions[5];
+    $node = $revisions[6];
 
     $this->drupalGet('node/' . $node->id() . '/history');
 
@@ -140,18 +136,19 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $this->assertCount(6, $table_rows);
 
     // Assert the revision titles are in place in the correct order.
-    for ($i = 0; $i < count($table_rows); $i++) {
-      $version_number = 5 - $i;
-      $row_html = $table_rows[$i]->getHtml();
+    foreach ($table_rows as $row_id => $table_row) {
+      $row_html = $table_row->getHtml();
+      $version_number = 5 - $row_id;
+      $revision_id = $version_number + 1;
 
       // Check that the version number is there.
       $this->assertContains($version_number . '.' . $version_number . '.' . $version_number, $row_html);
 
       // Check for the date.
-      $this->assertContains($date_formatter->format($revisions[$i]->get('revision_timestamp')->value, 'short'), $row_html);
+      $this->assertContains($date_formatter->format($revisions[$revision_id]->get('revision_timestamp')->value, 'short'), $row_html);
 
       // Original author, and editor names should appear.
-      $user = $revisions[$version_number]->revision_uid->entity;
+      $user = $revisions[$revision_id]->revision_uid->entity;
       $this->assertContains($user->getAccountName(), $row_html);
 
       // Check for the correct titles with the correct links.
@@ -165,14 +162,14 @@ class HistoryOverviewTest extends WebDriverTestBase {
         case 0:
           // The original node did not have the version number in it's title.
           $this->assertContains('My test node', $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$version_number]->getRevisionId() . '/view', $row_html);
+          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
           break;
 
         default:
           // Revision titles contain the version number with a link to
           // the revision.
           $this->assertContains('My test node ' . $version_number, $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$version_number]->getRevisionId() . '/view', $row_html);
+          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
           break;
       }
     }
@@ -188,9 +185,9 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $this->assertNotContains('Created by', $page->find('css', 'thead')->getText());
 
     // Assert the user names are not displayed anywhere in the page.
-    $admin_user = $revisions[0]->revision_uid->entity;
+    $admin_user = $revisions[1]->revision_uid->entity;
     $this->assertNotContains($admin_user->getAccountName(), $page->getText());
-    $editor_user = $revisions[2]->revision_uid->entity;
+    $editor_user = $revisions[3]->revision_uid->entity;
     $this->assertNotContains($editor_user->getAccountName(), $page->getText());
   }
 
