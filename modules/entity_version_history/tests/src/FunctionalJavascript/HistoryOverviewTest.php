@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_version_history\Functional;
 
-use Drupal\entity_version_history_test\EventSubscriber\TestHistoryOverviewAlterEventSubscriber;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 
 /**
@@ -168,22 +167,6 @@ class HistoryOverviewTest extends WebDriverTestBase {
           break;
       }
     }
-
-    // Set the state to trigger our test event subscriber.
-    $this->container->get('state')->set(TestHistoryOverviewAlterEventSubscriber::STATE, TRUE);
-
-    $this->drupalGet('node/' . $node->id() . '/history');
-
-    // We expect the revision Created by column to disappear.
-    $table_headers = $page->findAll('css', 'th');
-    $this->assertCount(3, $table_headers);
-    $this->assertNotContains('Created by', $page->find('css', 'thead')->getText());
-
-    // Assert the user names are not displayed anywhere in the page.
-    $admin_user = $revisions[1]->revision_uid->entity;
-    $this->assertNotContains($admin_user->getAccountName(), $page->getText());
-    $editor_user = $revisions[3]->revision_uid->entity;
-    $this->assertNotContains($editor_user->getAccountName(), $page->getText());
   }
 
 }
