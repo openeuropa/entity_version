@@ -15,7 +15,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\entity_version_history\Event\HistoryOverviewAlterEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -155,12 +154,6 @@ class EntityVersionHistoryController extends ControllerBase {
     ];
 
     $build['pager'] = ['#type' => 'pager'];
-
-    // Allow the alteration of history table render array through an event.
-    $event = new HistoryOverviewAlterEvent();
-    $event->setHistoryTable($build['entity_version_history_table']);
-    $this->eventDispatcher->dispatch(HistoryOverviewAlterEvent::EVENT, $event);
-    $build['entity_version_history_table'] = $event->getHistoryTable();
 
     return $build;
   }
