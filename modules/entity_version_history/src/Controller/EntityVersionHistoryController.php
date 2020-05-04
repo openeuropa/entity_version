@@ -102,7 +102,7 @@ class EntityVersionHistoryController extends ControllerBase {
     $history_storage = $this->entityTypeManager->getStorage('entity_version_history_settings');
     $history_setting = $history_storage->load($entity_type_id . '.' . $entity->bundle());
     $version_field = $history_setting->getTargetField();
-    $revision_timestamp_field = $this->entityTypeManager->getDefinition($entity_type_id)->getRevisionMetadataKeys()['revision_created'];
+    $revision_timestamp_field = $this->entityTypeManager->getDefinition($entity_type_id)->getRevisionMetadataKey('revision_created');
 
     foreach ($this->getRevisionIds($entity, $entity_storage) as $vid) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
