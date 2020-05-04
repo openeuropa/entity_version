@@ -64,11 +64,6 @@ class HistoryOverviewTest extends WebDriverTestBase {
       'target_field' => 'field_entity_version',
     ])->save();
 
-    // We need to invalidate cache because in our route subscriber and our
-    // entity type alter we are depending on the config we created above.
-    $entity_type_manager->clearCachedDefinitions();
-    $this->container->get('router.builder')->rebuild();
-
     /** @var \Drupal\node\Entity\Node $node */
     $node = $entity_type_manager->getStorage('node')->create([
       'type' => 'first_bundle',

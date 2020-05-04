@@ -22,6 +22,7 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'node',
+    'entity_test',
     'entity_version',
     'entity_version_history',
     'entity_version_history_test',
@@ -58,16 +59,16 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
 
     // Check we have the entity type checkboxes.
     $node_entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-node');
-    $history_entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-history-entity-test');
+    $test_entity_checkbox = $assert_session->elementExists('css', '#edit-entity-types-entity-test-rev');
 
     // Collect the bundle checkboxes and check that they are not visible.
     $first_bundle_checkbox = $assert_session->elementExists('css', '#edit-node-first-bundle');
     $second_bundle_checkbox = $assert_session->elementExists('css', '#edit-node-second-bundle');
-    $history_bundle_checkbox = $assert_session->elementExists('css', '#edit-history-entity-test-history-entity-test');
+    $test_entity_bundle_checkbox = $assert_session->elementExists('css', '#edit-entity-test-rev-entity-test-rev');
 
     $this->assertFalse($first_bundle_checkbox->isVisible());
     $this->assertFalse($second_bundle_checkbox->isVisible());
-    $this->assertFalse($history_bundle_checkbox->isVisible());
+    $this->assertFalse($test_entity_bundle_checkbox->isVisible());
 
     // Check the content entity type checkbox.
     $node_entity_checkbox->check();
@@ -75,13 +76,13 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     // Check the bundle checkboxes are now visible except the history bundle.
     $this->assertTrue($first_bundle_checkbox->isVisible());
     $this->assertTrue($second_bundle_checkbox->isVisible());
-    $this->assertFalse($history_bundle_checkbox->isVisible());
+    $this->assertFalse($test_entity_bundle_checkbox->isVisible());
 
-    // Check the history entity type checkbox.
-    $history_entity_checkbox->check();
+    // Check the test entity type checkbox.
+    $test_entity_checkbox->check();
 
-    // Check the bundle checkbox is visible for history.
-    $this->assertTrue($history_bundle_checkbox->isVisible());
+    // Check the bundle checkbox is visible for test entity.
+    $this->assertTrue($test_entity_bundle_checkbox->isVisible());
 
     // Check that there is only one select field and it's not visible.
     $selects = $page->findAll('css', 'details select');
@@ -99,7 +100,7 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     // Check the bundle checkboxes.
     $first_bundle_checkbox->check();
     $second_bundle_checkbox->check();
-    $history_bundle_checkbox->check();
+    $test_entity_bundle_checkbox->check();
 
     // Check that the select field has appeared.
     $this->assertTrue($select->isVisible());
@@ -119,8 +120,8 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertTrue($node_entity_checkbox->isChecked());
     $this->assertTrue($first_bundle_checkbox->isChecked());
     $this->assertTrue($second_bundle_checkbox->isChecked());
-    $this->assertTrue($history_entity_checkbox->isChecked());
-    $this->assertTrue($history_bundle_checkbox->isChecked());
+    $this->assertTrue($test_entity_checkbox->isChecked());
+    $this->assertTrue($test_entity_bundle_checkbox->isChecked());
 
     // Assert that the correct option is selected.
     $option_field = $assert_session->optionExists('node_second_bundle', 'field_entity_version');
@@ -139,15 +140,15 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertEquals('field_entity_version', $config->get('target_field'));
     $this->assertConfigSchema($this->container->get('config.typed'), $config->getName(), $config->get());
 
-    $config = $this->config('entity_version_history.settings.history_entity_test.history_entity_test');
-    $this->assertEquals('history_entity_test', $config->get('target_entity_type_id'));
-    $this->assertEquals('history_entity_test', $config->get('target_bundle'));
+    $config = $this->config('entity_version_history.settings.entity_test_rev.entity_test_rev');
+    $this->assertEquals('entity_test_rev', $config->get('target_entity_type_id'));
+    $this->assertEquals('entity_test_rev', $config->get('target_bundle'));
     $this->assertEquals('version', $config->get('target_field'));
     $this->assertConfigSchema($this->container->get('config.typed'), $config->getName(), $config->get());
 
-    // Remove configs by unchecking history entity checkbox and
+    // Remove configs by unchecking test entity checkbox and
     // the first_bundle checkbox from node entity.
-    $history_entity_checkbox->uncheck();
+    $test_entity_checkbox->uncheck();
     $first_bundle_checkbox->uncheck();
 
     $page->pressButton('Save configuration');
@@ -157,8 +158,8 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertTrue($second_bundle_checkbox->isChecked());
 
     $this->assertFalse($first_bundle_checkbox->isChecked());
-    $this->assertFalse($history_entity_checkbox->isChecked());
-    $this->assertFalse($history_bundle_checkbox->isChecked());
+    $this->assertFalse($test_entity_checkbox->isChecked());
+    $this->assertFalse($test_entity_bundle_checkbox->isChecked());
 
     // Check the configs are deleted. Only 1 should be left.
     $this->container->get('config.factory')->clearStaticCache();
