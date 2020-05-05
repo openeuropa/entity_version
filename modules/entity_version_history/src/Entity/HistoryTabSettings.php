@@ -153,6 +153,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
    * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
+    parent::postSave($storage, $update);
     // We need to invalidate cache because in our route subscriber and our
     // entity type alter we are depending on these config entities.
     \Drupal::service('entity_type.manager')->clearCachedDefinitions();
