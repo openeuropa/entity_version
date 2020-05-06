@@ -14,6 +14,9 @@ use Drupal\field\FieldConfigInterface;
  *
  * @ConfigEntityType(
  *   id = "entity_version_history_settings",
+ *   handlers = {
+ *     "storage" = "Drupal\entity_version_history\Entity\HistoryTabSettingsStorage",
+ *   },
  *   label = @Translation("Entity Version History Settings"),
  *   label_collection = @Translation("Entity Version History Settings"),
  *   label_singular = @Translation("entity version history setting"),
@@ -147,17 +150,6 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   public function preSave(EntityStorageInterface $storage): void {
     $this->id = $this->id();
     parent::preSave($storage);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
-    parent::postSave($storage, $update);
-    // We need to invalidate cache because in our route subscriber and our
-    // entity type alter we are depending on these config entities.
-    \Drupal::service('entity_type.manager')->clearCachedDefinitions();
-    \Drupal::service('router.builder')->rebuild();
   }
 
   /**
