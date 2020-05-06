@@ -8,9 +8,9 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -45,6 +45,13 @@ class EntityVersionHistoryController extends ControllerBase {
   protected $eventDispatcher;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * Constructs a EntityVersionHistoryController object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -53,11 +60,14 @@ class EntityVersionHistoryController extends ControllerBase {
    *   The date formatter service.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, EventDispatcherInterface $event_dispatcher, Connection $database) {
     $this->entityTypeManager = $entity_type_manager;
     $this->dateFormatter = $date_formatter;
     $this->eventDispatcher = $event_dispatcher;
+    $this->database = $database;
   }
 
   /**
@@ -67,7 +77,8 @@ class EntityVersionHistoryController extends ControllerBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('date.formatter'),
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('database')
     );
   }
 
@@ -103,48 +114,49 @@ class EntityVersionHistoryController extends ControllerBase {
     $version_field = $history_setting->getTargetField();
     $revision_timestamp_field = $this->entityTypeManager->getDefinition($entity_type_id)->getRevisionMetadataKey('revision_created');
 
-    foreach ($this->getRevisionIds($entity, $entity_storage) as $vid) {
+    foreach ($this->getRevisionIds($entity, $version_field) as $vid) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
       $revision = $entity_storage->loadRevision($vid);
+      if ($revision->hasTranslation($langcode)) {
+        $revision = $revision->getTranslation($langcode);
+      }
       // Only show revisions that are affected by the language that is being
       // displayed at the moment.
-      if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
-        $version = $this->t('No version set.');
-        if (!$revision->get($version_field)->isEmpty()) {
-          $version = $revision->get($version_field)->getValue();
-          $version = reset($version);
-        }
-
-        $date = $this->dateFormatter->format($revision->get($revision_timestamp_field)->value, 'short');
-
-        $username = [
-          '#theme' => 'username',
-          '#account' => $revision->getRevisionUser(),
-        ];
-
-        // We treat also the latest translation-affecting revision as current
-        // revision, if it was the default revision, as its values for the
-        // current language will be the same of the current default revision in
-        // this case.
-        $is_current_revision = $vid === $default_revision || (!$current_revision_displayed && $revision->wasDefaultRevision());
-        if (!$is_current_revision) {
-          $link = $revision->toLink($revision->label(), 'revision')->toRenderable();
-        }
-        else {
-          $link = $entity->toLink()->toRenderable();
-          $current_revision_displayed = TRUE;
-        }
-
-        // Populate the rows of the table with the data.
-        $rows[] = [
-          'data' => [
-            implode('.', $version),
-            ['data' => $link],
-            $date,
-            ['data' => $username],
-          ],
-        ];
+      $version = $this->t('No version set.');
+      if (!$revision->get($version_field)->isEmpty()) {
+        $version = $revision->get($version_field)->getValue();
+        $version = reset($version);
       }
+
+      $date = $this->dateFormatter->format($revision->get($revision_timestamp_field)->value, 'short');
+
+      $username = [
+        '#theme' => 'username',
+        '#account' => $revision->getRevisionUser(),
+      ];
+
+      // We treat also the latest translation-affecting revision as current
+      // revision, if it was the default revision, as its values for the
+      // current language will be the same of the current default revision in
+      // this case.
+      $is_current_revision = $vid === $default_revision || (!$current_revision_displayed && $revision->wasDefaultRevision());
+      if (!$is_current_revision) {
+        $link = $revision->toLink($revision->label(), 'revision')->toRenderable();
+      }
+      else {
+        $link = $entity->toLink()->toRenderable();
+        $current_revision_displayed = TRUE;
+      }
+
+      // Populate the rows of the table with the data.
+      $rows[] = [
+        'data' => [
+          implode('.', $version),
+          ['data' => $link],
+          $date,
+          ['data' => $username],
+        ],
+      ];
     }
 
     $build['entity_version_history_table'] = [
@@ -237,21 +249,30 @@ class EntityVersionHistoryController extends ControllerBase {
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The content entity storage.
+   * @param string $version_field
+   *   The name of the field that holds the version.
    *
    * @return int[]
    *   Revision IDs (in descending order).
    */
-  protected function getRevisionIds(ContentEntityInterface $entity, EntityStorageInterface $storage): array {
-    $result = $storage->getQuery()
-      ->allRevisions()
-      ->condition($entity->getEntityType()->getKey('id'), $entity->id())
-      ->sort($entity->getEntityType()->getKey('revision'), 'DESC')
-      ->pager(50)
-      ->execute();
+  protected function getRevisionIds(ContentEntityInterface $entity, string $version_field): array {
+    // Determine the name of the table that holds the version.
+    $storage_definition = $entity->getFieldDefinition($version_field)->getFieldStorageDefinition();
+    /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping */
+    $table_mapping = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->getTableMapping();
+    $table_name = $table_mapping->getDedicatedRevisionTableName($storage_definition);
 
-    return array_keys($result);
+    // Query for the revisions that hold unique versions in the language of the
+    // passed entity.
+    $query = $this->database->select($table_name, 'v');
+    $query->addExpression("CONCAT(v.field_version_major, '.', v.field_version_minor, '.', v.field_version_patch)", 'version');
+    $query->addExpression('max(v.revision_id)', 'highest_revision_id');
+    $query->groupBy('version');
+    $query->orderBy('highest_revision_id', 'DESC');
+    $query->condition('v.langcode', $entity->language()->getId());
+    $results = $query->execute()->fetchAll();
+
+    return array_column($results, 'highest_revision_id');
   }
 
 }
