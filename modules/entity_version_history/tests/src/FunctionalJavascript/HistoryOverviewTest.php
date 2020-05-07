@@ -86,8 +86,6 @@ class HistoryOverviewTest extends WebDriverTestBase {
         'patch' => $version_number,
       ];
       $node->set('field_entity_version', $version);
-      $node->set('field_entity_version', $version);
-      $node->set('field_entity_version', $version);
 
       // Edit the 1st and 2nd revision with a different user.
       if ($i < 2) {
