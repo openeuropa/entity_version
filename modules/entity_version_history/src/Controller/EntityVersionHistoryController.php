@@ -264,6 +264,7 @@ class EntityVersionHistoryController extends ControllerBase {
     $query->groupBy('version');
     $query->orderBy('highest_revision_id', 'DESC');
     $query->condition('v.langcode', $entity->language()->getId());
+    $query->condition('v.entity_id', $entity->id());
     $results = $query->execute()->fetchAll();
 
     return array_column($results, 'highest_revision_id');
