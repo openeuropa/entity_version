@@ -14,6 +14,9 @@ use Drupal\field\FieldConfigInterface;
  *
  * @ConfigEntityType(
  *   id = "entity_version_history_settings",
+ *   handlers = {
+ *     "storage" = "Drupal\entity_version_history\Entity\HistoryTabSettingsStorage",
+ *   },
  *   label = @Translation("Entity Version History Settings"),
  *   label_collection = @Translation("Entity Version History Settings"),
  *   label_singular = @Translation("entity version history setting"),

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_version_history\Kernel;
 
-use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
@@ -64,8 +63,6 @@ class HistoryTabTest extends KernelTestBase {
       'target_bundle' => 'first_bundle',
       'target_field' => 'field_entity_version',
     ])->save();
-
-    $this->container->get('entity_type.manager')->clearCachedDefinitions();
   }
 
   /**
@@ -78,20 +75,20 @@ class HistoryTabTest extends KernelTestBase {
     /** @var \Drupal\Core\Entity\EntityTypeInterface $definition */
     foreach ($this->container->get('entity_type.manager')->getDefinitions() as $definition) {
       if ($definition->id() === 'node') {
-        $this->assertTrue($definition->hasLinkTemplate('drupal:entity-version-history'));
-        $this->assertInstanceOf(Route::class, $route_provider->getRouteByName('entity.' . $definition->id() . '.history'));
+        $this->assertTrue($definition->hasLinkTemplate('entity-version-history'));
+        $this->assertInstanceOf(Route::class, $route_provider->getRouteByName('entity.' . $definition->id() . '.entity_version_history'));
         $history_local_task = $local_task_manager->getDefinition('entity_version_history.entity.history:' . $definition->id());
-        $this->assertEquals('entity.' . $definition->id() . '.history', $history_local_task['route_name']);
+        $this->assertEquals('entity.' . $definition->id() . '.entity_version_history', $history_local_task['route_name']);
         $this->assertEquals('entity.' . $definition->id() . '.canonical', $history_local_task['base_route']);
 
         continue;
       }
 
-      $this->assertFalse($definition->hasLinkTemplate('drupal:entity-version-history'));
+      $this->assertFalse($definition->hasLinkTemplate('entity-version-history'));
 
       $exception = NULL;
       try {
-        $route_provider->getRouteByName('entity.' . $definition->id() . '.history');
+        $route_provider->getRouteByName('entity.' . $definition->id() . '.entity_version_history');
       }
       catch (\Exception $e) {
         $exception = $e;
@@ -123,10 +120,6 @@ class HistoryTabTest extends KernelTestBase {
     $user_with_permission = $this->createUser(['access entity version history']);
     $user_without_permission = $this->createUser();
 
-    $history_url = Url::fromRoute('entity.node.history', [
-      'node' => $node->id(),
-    ]);
-
     /** @var \Drupal\Core\Access\AccessManager $access_manager */
     $access_manager = $this->container->get('access_manager');
     $cache_contexts = [
@@ -141,14 +134,14 @@ class HistoryTabTest extends KernelTestBase {
 
     // Assert that we can't access the history page when no permissions are
     // assigned.
-    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_without_permission, TRUE);
+    $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_without_permission, TRUE);
     $this->assertTrue($access_result->isForbidden());
     $this->assertEquals('Insufficient permissions to access the entity version history page.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
     $this->assertEquals($cache_tags, $access_result->getCacheTags());
 
     // A user with permissions can access the history page.
-    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_with_permission, TRUE);
+    $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_with_permission, TRUE);
     $this->assertTrue($access_result->isAllowed());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
     $this->assertEquals($cache_tags, $access_result->getCacheTags());
@@ -170,7 +163,7 @@ class HistoryTabTest extends KernelTestBase {
 
     // We can't access the history page without a corresponding
     // history config.
-    $access_result = $access_manager->checkNamedRoute('entity.node.history', ['node' => $node->id()], $user_with_permission, TRUE);
+    $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_with_permission, TRUE);
     $this->assertTrue($access_result->isForbidden());
     $this->assertEquals('No history settings found for this entity type and bundle.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());

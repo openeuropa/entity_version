@@ -10,20 +10,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Routing\RouteBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure the history tab settings per content entity type and bundle.
  */
 class HistoryTabSettingsForm extends FormBase {
-
-  /**
-   * The route builder service.
-   *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
-   */
-  protected $routeBuilder;
 
   /**
    * The entity type manager.
@@ -56,8 +48,6 @@ class HistoryTabSettingsForm extends FormBase {
   /**
    * Constructs an HistoryTabSettingsForm object.
    *
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
-   *   The route builder.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_info
@@ -67,8 +57,7 @@ class HistoryTabSettingsForm extends FormBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(RouteBuilderInterface $route_builder, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entityFieldManager, MessengerInterface $messenger) {
-    $this->routeBuilder = $route_builder;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entityFieldManager, MessengerInterface $messenger) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_bundle_info;
     $this->entityFieldManager = $entityFieldManager;
@@ -80,7 +69,6 @@ class HistoryTabSettingsForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('router.builder'),
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('entity_field.manager'),
@@ -114,6 +102,11 @@ class HistoryTabSettingsForm extends FormBase {
 
       if (!$definition->hasLinkTemplate('canonical')) {
         // We are only interested in entity types that have a canonical URL.
+        continue;
+      }
+
+      if (!$definition->isRevisionable()) {
+        // We are only interested in entity types that can have revisions.
         continue;
       }
 
@@ -263,11 +256,6 @@ class HistoryTabSettingsForm extends FormBase {
         }
       }
     }
-
-    // We need to invalidate cache because in our route subscriber and our
-    // entity type alter we are depending on these configs we create.
-    $this->entityTypeManager->clearCachedDefinitions();
-    $this->routeBuilder->rebuild();
 
     $this->messenger->addStatus($this->t('The Version history configuration has been saved.'));
   }

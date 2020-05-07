@@ -52,12 +52,12 @@ class HistoryLocalTask extends DeriverBase implements ContainerDeriverInterface 
     $definitions = $this->entityTypeManager->getDefinitions();
 
     foreach ($definitions as $definition) {
-      if (!$definition->hasLinkTemplate('drupal:entity-version-history')) {
+      if (!$definition->hasLinkTemplate('entity-version-history')) {
         continue;
       }
 
       $tasks[$definition->id()] = [
-        'route_name' => 'entity.' . $definition->id() . '.history',
+        'route_name' => 'entity.' . $definition->id() . '.entity_version_history',
         'base_route' => 'entity.' . $definition->id() . '.canonical',
       ] + $base_plugin_definition;
     }
