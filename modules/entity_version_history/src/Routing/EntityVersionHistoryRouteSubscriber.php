@@ -37,13 +37,12 @@ class EntityVersionHistoryRouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
-
-      if (!$entity_type->hasLinkTemplate('drupal:entity-version-history')) {
+      if (!$entity_type->hasLinkTemplate('entity-version-history')) {
         continue;
       }
 
       $route = new Route(
-        $entity_type->getLinkTemplate('drupal:entity-version-history'),
+        $entity_type->getLinkTemplate('entity-version-history'),
         [
           '_controller' => EntityVersionHistoryController::class . '::historyOverview',
           '_title_callback' => EntityVersionHistoryController::class . '::title',
@@ -61,7 +60,7 @@ class EntityVersionHistoryRouteSubscriber extends RouteSubscriberBase {
           ],
         ]
       );
-      $route_name = "entity.$entity_type_id.history";
+      $route_name = "entity.$entity_type_id.entity_version_history";
       $collection->add($route_name, $route);
     }
   }
