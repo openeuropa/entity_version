@@ -76,13 +76,18 @@ class HistoryOverviewTest extends WebDriverTestBase {
     for ($i = 0; $i < $revision_count; $i++) {
       $version_number = $i + 1;
       // Change the title for each revision.
-      $node->title = 'My test node ' . $version_number;
+      $node->set('title', 'My test node ' . $version_number);
       $node->setNewRevision();
 
       // Increment the version numbers.
-      $node->field_entity_version->major = $version_number;
-      $node->field_entity_version->minor = $version_number;
-      $node->field_entity_version->patch = $version_number;
+      $version = [
+        'major' => $version_number,
+        'minor' => $version_number,
+        'patch' => $version_number,
+      ];
+      $node->set('field_entity_version', $version);
+      $node->set('field_entity_version', $version);
+      $node->set('field_entity_version', $version);
 
       // Edit the 1st and 2nd revision with a different user.
       if ($i < 2) {
@@ -97,6 +102,13 @@ class HistoryOverviewTest extends WebDriverTestBase {
       $revision_ids[] = $node->getRevisionId();
     }
 
+    // Create also a revision in which we do not update the version.
+    $node->setNewRevision();
+    $node->setRevisionUserId($this->adminUser->id());
+    $node->set('title', 'Updated without version change');
+    $node->save();
+    $revision_ids[] = $node->getRevisionId();
+
     $this->revisions = $entity_type_manager->getStorage('node')->loadMultipleRevisions($revision_ids);
   }
 
@@ -106,16 +118,16 @@ class HistoryOverviewTest extends WebDriverTestBase {
   public function testHistoryOverviewTable(): void {
     $revisions = $this->revisions;
 
-    // Get last revision.
-    $node = $revisions[6];
+    // Get one of the revisions.
+    $node = $revisions[7];
 
-    $this->drupalGet('node/' . $node->id() . '/history');
+    $this->drupalGet($node->toUrl('entity-version-history'));
 
     $page = $this->getSession()->getPage();
     $date_formatter = $this->container->get('date.formatter');
 
     // Check we are on the correct page.
-    $this->assertEquals('History for My test node 5', $page->find('css', 'h1')->getText());
+    $this->assertEquals('History for Updated without version change', $page->find('css', 'h1')->getText());
 
     // Confirm the table headers are in place.
     $table_headers = $page->findAll('css', 'th');
@@ -125,11 +137,12 @@ class HistoryOverviewTest extends WebDriverTestBase {
     $this->assertEquals('Date', $table_headers[2]->getText());
     $this->assertEquals('Created by', $table_headers[3]->getText());
 
-    // Check the rows of the table and it's values.
     $table_rows = $page->find('css', 'tbody')->findAll('css', 'tr');
+    // Even though there are 7 revisions, there should be only 6 table rows
+    // because one of the revisions has the same version.
     $this->assertCount(6, $table_rows);
+    $this->assertCount(7, $this->revisions);
 
-    // Assert the revision titles are in place in the correct order.
     foreach ($table_rows as $row_id => $table_row) {
       $row_html = $table_row->getHtml();
       $version_number = 5 - $row_id;
@@ -148,9 +161,12 @@ class HistoryOverviewTest extends WebDriverTestBase {
       // Check for the correct titles with the correct links.
       switch ($version_number) {
         case 5:
-          // The latest and default revision link goes to the node.
+          // The latest and default revision link goes to the node. And since
+          // there are two revisions with the same version, the latest one is
+          // shown.
           $this->assertContains('node/' . $node->id(), $row_html);
-          $this->assertContains('My test node 5', $row_html);
+          $this->assertContains('Updated without version change', $row_html);
+          $this->assertSession()->pageTextNotContains('My test node 5');
           break;
 
         case 0:
