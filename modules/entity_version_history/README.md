@@ -4,7 +4,8 @@ The module provides a "History" tab (local task) for content entities that have 
 visualise the versions in a table format.
 
 ## Configurations
-It provides a configuration page where the History tab can be enabled content entity/bundle
+It provides a configuration page found at "admin/config/entity-version/history-tab" where the History tab can
+be enabled for entities and their bundles that have the Version field.
 basis where the version field is in place.
 
 ## Permissions
