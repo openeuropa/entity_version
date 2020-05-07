@@ -16,7 +16,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Builds the version history table.
@@ -38,13 +37,6 @@ class EntityVersionHistoryController extends ControllerBase {
   protected $dateFormatter;
 
   /**
-   * The event dispatcher service.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -58,15 +50,12 @@ class EntityVersionHistoryController extends ControllerBase {
    *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher service.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, EventDispatcherInterface $event_dispatcher, Connection $database) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, Connection $database) {
     $this->entityTypeManager = $entity_type_manager;
     $this->dateFormatter = $date_formatter;
-    $this->eventDispatcher = $event_dispatcher;
     $this->database = $database;
   }
 
@@ -77,7 +66,6 @@ class EntityVersionHistoryController extends ControllerBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('date.formatter'),
-      $container->get('event_dispatcher'),
       $container->get('database')
     );
   }
@@ -163,6 +151,9 @@ class EntityVersionHistoryController extends ControllerBase {
       '#theme' => 'table',
       '#header' => $header,
       '#rows' => $rows,
+      '#cache' => [
+        'tags' => $entity->getEntityType()->getListCacheTags(),
+      ],
     ];
 
     $build['pager'] = ['#type' => 'pager'];
@@ -265,7 +256,10 @@ class EntityVersionHistoryController extends ControllerBase {
     // Query for the revisions that hold unique versions in the language of the
     // passed entity.
     $query = $this->database->select($table_name, 'v');
-    $query->addExpression("CONCAT(v.field_version_major, '.', v.field_version_minor, '.', v.field_version_patch)", 'version');
+    $major = "{$version_field}_major";
+    $minor = "{$version_field}_minor";
+    $patch = "{$version_field}_patch";
+    $query->addExpression("CONCAT(v.$major, '.', v.$minor, '.', v.$patch)", 'version');
     $query->addExpression('max(v.revision_id)', 'highest_revision_id');
     $query->groupBy('version');
     $query->orderBy('highest_revision_id', 'DESC');

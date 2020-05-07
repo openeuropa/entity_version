@@ -30,6 +30,6 @@ function entity_version_history_entity_type_alter(array &$entity_types) {
     }
 
     $history_path = $entity_types[$entity_type]->getLinkTemplate('canonical') . '/history';
-    $entity_types[$entity_type]->setLinkTemplate('drupal:entity-version-history', $history_path);
+    $entity_types[$entity_type]->setLinkTemplate('entity-version-history', $history_path);
   }
 }
