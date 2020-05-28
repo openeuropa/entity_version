@@ -74,6 +74,11 @@ class EntityVersionWorkflowManager {
       return;
     }
 
+    // We don't update the entity version if it is flagged not to.
+    if (isset($entity->entity_version_no_update) && $entity->entity_version_no_update) {
+      return;
+    }
+
     /** @var \Drupal\workflows\WorkflowInterface $workflow */
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
     if (!$workflow) {

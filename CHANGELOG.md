@@ -1,10 +1,24 @@
 # Change Log
 
+## [8.x-1.0-beta3](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta3) (2020-04-08)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta2...8.x-1.0-beta3)
+
+**Merged pull requests:**
+
+- OPENEUROPA-0000: Drupal core dependency. [\#20](https://github.com/openeuropa/entity_version/pull/20) ([upchuk](https://github.com/upchuk))
+- OPENEUROPA-2889: Allow to flag entities so that the version number is not updated. [\#18](https://github.com/openeuropa/entity_version/pull/18) ([imanoleguskiza](https://github.com/imanoleguskiza))
+- OPENEUROPA-2943: Upgrade to PHP 7.3. [\#17](https://github.com/openeuropa/entity_version/pull/17) ([sergepavle](https://github.com/sergepavle))
+- OPENEUROPA-2604: Drupal 8 recommended project. [\#16](https://github.com/openeuropa/entity_version/pull/16) ([upchuk](https://github.com/upchuk))
+- OPENEUROPA-2258: Undo use of PHP 7.2. [\#15](https://github.com/openeuropa/entity_version/pull/15) ([dxvargas](https://github.com/dxvargas))
+- OPENEUROPA-2464: Use PHP 7.1 in docker-compose. [\#14](https://github.com/openeuropa/entity_version/pull/14) ([dxvargas](https://github.com/dxvargas))
+- OPENEUROPA-2258: Use PHP 7.2 in drone and docker image. [\#13](https://github.com/openeuropa/entity_version/pull/13) ([dxvargas](https://github.com/dxvargas))
+
 ## [8.x-1.0-beta2](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta2) (2019-08-12)
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/1.0.0-beta1...8.x-1.0-beta2)
 
 **Merged pull requests:**
 
+- OPENEUROPA-2076: Release-8.x-1.0-beta2. [\#12](https://github.com/openeuropa/entity_version/pull/12) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-2076: Prepare module to drupal.org. [\#11](https://github.com/openeuropa/entity_version/pull/11) ([nagyad](https://github.com/nagyad))
 
 ## [1.0.0-beta1](https://github.com/openeuropa/entity_version/tree/1.0.0-beta1) (2019-07-09)

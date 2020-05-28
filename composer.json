@@ -6,14 +6,15 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "drupal/core-recommended": "^8.7",
-        "php": "^7.1"
+        "drupal/core": "^8.7",
+        "php": ">=7.2"
     },
     "require-dev": {
         "composer/installers": "~1.5",
         "drupal-composer/drupal-scaffold": "~2.2",
         "drupal/config_devel": "~1.2",
         "drush/drush": "~9.0@stable",
+        "guzzlehttp/guzzle": "~6.3",
         "openeuropa/code-review": "~1.0.0-beta2",
         "openeuropa/drupal-core-require-dev": "^8.7",
         "openeuropa/task-runner": "~1.0.0-beta5",
