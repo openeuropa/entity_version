@@ -30,7 +30,7 @@ class HistoryTabTest extends KernelTestBase {
     'system',
     'entity_version',
     'entity_version_history',
-    'entity_version_history_test',
+    'entity_version_test',
   ];
 
   /**
@@ -41,7 +41,7 @@ class HistoryTabTest extends KernelTestBase {
 
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
-    $this->installEntitySchema('entity_version_history_settings');
+    $this->installEntitySchema('entity_version_settings');
     $this->installSchema('system', 'sequences');
     $this->installSchema('node', 'node_access');
 
@@ -52,12 +52,12 @@ class HistoryTabTest extends KernelTestBase {
       'field',
       'entity_version',
       'entity_version_history',
-      'entity_version_history_test',
+      'entity_version_test',
     ]);
 
     // Create a history tab setting for the corresponding entity type
     // and bundle.
-    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_history_settings');
+    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_settings');
     $history_storage->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'first_bundle',
@@ -127,8 +127,8 @@ class HistoryTabTest extends KernelTestBase {
       'user.permissions',
     ];
     $cache_tags = [
-      'config:entity_version_history.settings.' . $node->getEntityTypeId() . '.' . $node->bundle(),
-      'config:entity_version_history_settings_list',
+      'config:entity_version.settings.' . $node->getEntityTypeId() . '.' . $node->bundle(),
+      'config:entity_version_settings_list',
       $node->getEntityTypeId() . ':' . $node->id(),
     ];
 
@@ -148,7 +148,7 @@ class HistoryTabTest extends KernelTestBase {
 
     // Remove the corresponding history config.
     $entity_type_manager
-      ->getStorage('entity_version_history_settings')
+      ->getStorage('entity_version_settings')
       ->load('node.first_bundle')
       ->delete();
 
@@ -157,7 +157,7 @@ class HistoryTabTest extends KernelTestBase {
       'route',
     ];
     $cache_tags = [
-      'config:entity_version_history_settings_list',
+      'config:entity_version_settings_list',
       $node->getEntityTypeId() . ':' . $node->id(),
     ];
 

@@ -34,7 +34,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
     'node',
     'entity_version',
     'entity_version_history',
-    'entity_version_history_test',
+    'entity_version_test',
   ];
 
   /**
@@ -45,7 +45,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
 
     // Create user.
     $this->adminUser = $this->drupalCreateUser([
-      'access entity version history configuration',
+      'access entity version configuration',
       'access administration pages',
       'access entity version history',
       'edit any first_bundle content',
@@ -56,7 +56,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
     // Create a history tab setting for the corresponding entity type
     // and bundle.
     $entity_type_manager = $this->container->get('entity_type.manager');
-    $history_storage = $entity_type_manager->getStorage('entity_version_history_settings');
+    $history_storage = $entity_type_manager->getStorage('entity_version_settings');
     $history_storage->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'first_bundle',

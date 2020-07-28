@@ -14,7 +14,7 @@ function entity_version_history_entity_type_alter(array &$entity_types) {
   /* @var $config_factory \Drupal\Core\Config\ConfigFactory */
   $config_factory = \Drupal::configFactory();
   // To avoid infinite loop we use config factory to load all configs.
-  $configs = $config_factory->listAll('entity_version_history.settings');
+  $configs = $config_factory->listAll('entity_version.settings');
 
   if (empty($configs)) {
     return;
