@@ -21,3 +21,20 @@ field.formatter.settings.entity_version:
     minimum_category:
       type: string
       label: 'Minimum version'
+
+entity_version.settings.*.*:
+  type: config_entity
+  label: 'Entity Version Settings'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    target_entity_type_id:
+      type: string
+      label: 'Entity Type ID'
+    target_bundle:
+      type:  string
+      label: 'Bundle'
+    target_field:
+      type: string
+      label: 'Target field'
