@@ -2,18 +2,18 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\Tests\entity_version_history\Unit;
+namespace Drupal\Tests\entity_version\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\entity_version_history\Entity\HistoryTabSettings;
+use Drupal\entity_version\Entity\EntityVersionSettings;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\UnitTestCase;
 
 /**
  * Test HistoryTabSettings entity class.
  *
- * @coversDefaultClass \Drupal\entity_version_history\Entity\HistoryTabSettings
+ * @coversDefaultClass \Drupal\entity_version\Entity\EntityVersionSettings
  * @group entity_version_history
  */
 class HistoryTabSettingsUnitTest extends UnitTestCase {
@@ -134,11 +134,11 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       ->with('test_entity_type', 'test_bundle')
       ->will($this->returnValue($field_definitions));
 
-    $history_config = new HistoryTabSettings([
+    $history_config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => $field->getName(),
-    ], 'entity_version_history_settings');
+    ], 'entity_version_settings');
 
     $dependencies = $history_config->calculateDependencies()->getDependencies();
 
@@ -151,7 +151,7 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
    * @covers ::id()
    */
   public function testId(): void {
-    $config = new HistoryTabSettings([
+    $config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => 'test_field',
@@ -163,11 +163,11 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
    * @covers ::getTargetEntityTypeId()
    */
   public function testTargetEntityTypeId(): void {
-    $config = new HistoryTabSettings([
+    $config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
+    ], 'entity_version_settings');
     $this->assertSame('test_entity_type', $config->getTargetEntityTypeId());
   }
 
@@ -175,11 +175,11 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
    * @covers ::getTargetBundle()
    */
   public function testTargetBundle(): void {
-    $config = new HistoryTabSettings([
+    $config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
+    ], 'entity_version_settings');
     $this->assertSame('test_bundle', $config->getTargetBundle());
   }
 
@@ -187,11 +187,11 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
    * @covers ::getTargetField()
    */
   public function testTargetField(): void {
-    $config = new HistoryTabSettings([
+    $config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
+    ], 'entity_version_settings');
     $this->assertSame('test_field', $config->getTargetField());
   }
 
