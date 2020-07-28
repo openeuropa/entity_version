@@ -11,12 +11,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Test HistoryTabSettings entity class.
+ * Test EntityVersionSettingsForm entity class.
  *
  * @coversDefaultClass \Drupal\entity_version\Entity\EntityVersionSettings
- * @group entity_version_history
+ * @group entity_version
  */
-class HistoryTabSettingsUnitTest extends UnitTestCase {
+class EntityVersionSettingsUnitTest extends UnitTestCase {
 
   /**
    * The entity type used for testing.
@@ -134,13 +134,13 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       ->with('test_entity_type', 'test_bundle')
       ->will($this->returnValue($field_definitions));
 
-    $history_config = new EntityVersionSettings([
+    $entity_version_config = new EntityVersionSettings([
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => $field->getName(),
     ], 'entity_version_settings');
 
-    $dependencies = $history_config->calculateDependencies()->getDependencies();
+    $dependencies = $entity_version_config->calculateDependencies()->getDependencies();
 
     // Assert that we have the required dependencies for our config entity.
     $this->assertContains('field.field.test_entity_type.test_field', $dependencies['config']);
@@ -155,7 +155,7 @@ class HistoryTabSettingsUnitTest extends UnitTestCase {
       'target_entity_type_id' => 'test_entity_type',
       'target_bundle' => 'test_bundle',
       'target_field' => 'test_field',
-    ], 'entity_version_history_settings');
+    ], 'entity_version_settings');
     $this->assertSame('test_entity_type.test_bundle', $config->id());
   }
 

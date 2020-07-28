@@ -3,10 +3,10 @@ status: true
 dependencies:
   enforced:
     module:
-      - entity_version_history_test
-name: History first bundle
+      - entity_version_test
+name: First bundle
 type: first_bundle
-description: 'Provides an example content type to test the entity versions history.'
+description: 'Provides an example content type to test the entity versions.'
 help: ''
 new_revision: true
 preview_mode: 1
