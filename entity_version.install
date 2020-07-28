@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install and update functions for the Entity Version History module.
+ * Install and update functions for the Entity Version module.
  */
 
 declare(strict_types = 1);
@@ -10,7 +10,7 @@ declare(strict_types = 1);
 /**
  * Implements hook_uninstall().
  */
-function entity_version_history_uninstall() {
+function entity_version_uninstall() {
   // Remove the existing config entities.
   $storage = \Drupal::entityTypeManager()->getStorage('entity_version_settings');
   $configs = $storage->loadMultiple();
