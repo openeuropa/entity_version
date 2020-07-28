@@ -7,7 +7,7 @@ namespace Drupal\entity_version;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining history tabs settings for content entities.
+ * Provides an interface defining entity version settings for content entities.
  */
 interface EntityVersionSettingsInterface extends ConfigEntityInterface {
 
