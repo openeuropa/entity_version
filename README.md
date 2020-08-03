@@ -6,10 +6,10 @@ Versions are composed of major, minor and patch numbers and can be changed manua
 The module includes the "Entity version workflows" sub-module which allows configuration and control of version numbers through workflow state transitions.
 
 ## Configurations
-It provides a configuration page found at "admin/config/entity-version/settings" where appropriate Version field can be selected for entities and their bundles that have at least one Version field.
+It provides a configuration page found at "admin/config/entity-version/settings" where an appropriate Version field can be selected for entities and their bundles that have at least one Version field.
 
 ## Permissions
-This module provides a permission called `access entity version configuration` which permits configure the version settings.
+This module provides a permission called `access entity version configuration` which permits configuring the version settings.
 
 ## Development setup
 
