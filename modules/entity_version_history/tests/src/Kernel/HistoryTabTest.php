@@ -165,7 +165,7 @@ class HistoryTabTest extends KernelTestBase {
     // history config.
     $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_with_permission, TRUE);
     $this->assertTrue($access_result->isForbidden());
-    $this->assertEquals('No history settings found for this entity type and bundle.', $access_result->getReason());
+    $this->assertEquals('No version settings found for this entity type and bundle.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
     $this->assertEquals($cache_tags, $access_result->getCacheTags());
   }
