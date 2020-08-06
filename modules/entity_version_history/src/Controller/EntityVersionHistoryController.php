@@ -97,9 +97,9 @@ class EntityVersionHistoryController extends ControllerBase {
     $current_revision_displayed = FALSE;
 
     // Get the version field name from the corresponding history config.
-    $history_storage = $this->entityTypeManager->getStorage('entity_version_settings');
-    $history_setting = $history_storage->load($entity_type_id . '.' . $entity->bundle());
-    $version_field = $history_setting->getTargetField();
+    $entity_version_storage = $this->entityTypeManager->getStorage('entity_version_settings');
+    $version_field_setting = $entity_version_storage->load($entity_type_id . '.' . $entity->bundle());
+    $version_field = $version_field_setting->getTargetField();
     $revision_timestamp_field = $this->entityTypeManager->getDefinition($entity_type_id)->getRevisionMetadataKey('revision_created');
 
     foreach ($this->getRevisionIds($entity, $version_field) as $vid) {
@@ -187,7 +187,7 @@ class EntityVersionHistoryController extends ControllerBase {
     $cache->addCacheTags($entity_version_storage->getEntityType()->getListCacheTags());
 
     if (!$config_entity = $entity_version_storage->load($entity->getEntityTypeId() . '.' . $bundle)) {
-      return AccessResult::forbidden('No history settings found for this entity type and bundle.')->addCacheableDependency($cache);
+      return AccessResult::forbidden('No version settings found for this entity type and bundle.')->addCacheableDependency($cache);
     }
 
     $cache->addCacheableDependency($config_entity);
