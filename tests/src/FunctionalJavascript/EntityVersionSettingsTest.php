@@ -86,9 +86,9 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
 
     // Check that there is only one select field and it's not visible.
     $selects = $page->findAll('css', 'details select');
-    $this->assertCount(1, $selects);
+    $this->assertCount(3, $selects);
     $select = reset($selects);
-    $this->assertEquals('node_second_bundle', $select->getAttribute('name'));
+    $this->assertEquals('entity_test_rev_entity_test_rev', $select->getAttribute('name'));
     $this->assertFalse($select->isVisible());
 
     // Assert that the correct options are present in the field.
@@ -108,7 +108,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
     $page->pressButton('Save configuration');
 
     $status_message = $assert_session->waitForElement('css', '.messages--status');
-    $this->assertEquals('Status message The Entity Version configuration has been saved.', $status_message->getText());
+    $this->assertEquals('Status message The Entity version configuration has been saved.', $status_message->getText());
 
     // Check that there are only 3 config entities created.
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
