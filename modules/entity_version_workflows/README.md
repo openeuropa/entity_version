@@ -18,4 +18,4 @@ $entity->entity_version_no_update = TRUE;
 
 ## Configurations
 Entity version settings under path "admin/config/entity-version/settings" have to be configured in order to
-have the entity version workflows functionality fully operational.
+have the entity version workflows functionality fully operational. If no field is configured, the workflow functionality is not applied.
