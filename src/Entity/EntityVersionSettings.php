@@ -25,7 +25,7 @@ use Drupal\field\FieldConfigInterface;
  *     singular = "@count entity version setting",
  *     plural = "@count entity version settings",
  *   ),
- *   admin_permission = "access entity version configuration",
+ *   admin_permission = "administer entity version configuration",
  *   config_prefix = "settings",
  *   entity_keys = {
  *     "id" = "id"

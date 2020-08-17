@@ -137,12 +137,11 @@ class EntityVersionSettingsForm extends FormBase {
 
     $form['description'] = [
       '#type' => 'item',
-      '#markup' => $this->t('Configure the Entity Version field for each entity type and bundle.'),
+      '#markup' => $this->t('For each entity type and bundle that have at least one Entity version field, configure which field should be marked as main. Said fields will be used to apply functionalities offered by sub-modules. If no choice is made for a bundle, said functionalities will be disabled.'),
     ];
 
     // Create checkboxes for all entity types.
     $form['entity_types'] = [
-      '#title' => $this->t('Entity types that have a Version field'),
       '#type' => 'checkboxes',
       '#options' => $entity_labels,
       '#default_value' => isset($entity_version_configs) ? array_keys($entity_version_configs) : [],
@@ -153,7 +152,6 @@ class EntityVersionSettingsForm extends FormBase {
       $form['settings'][$entity_type_id . '_bundles'] = [
         '#type' => 'details',
         '#title' => $entity_labels[$entity_type_id],
-        '#description' => $this->t('The bundles that have a Version field.'),
         '#open' => TRUE,
         '#states' => [
           'visible' => [
@@ -170,22 +168,22 @@ class EntityVersionSettingsForm extends FormBase {
 
       // Create select list of the version fields in the bundle.
       foreach ($bundles as $bundle_name => $label) {
-        $access = TRUE;
+        $disabled = FALSE;
         $default_value = [];
 
         if (count($field_labels[$entity_type_id][$bundle_name]) === 1) {
           // Remove access if there is only one version field and
           // set the default_value for the form field.
-          $access = FALSE;
+          $disabled = TRUE;
           $default_value = key($field_labels[$entity_type_id][$bundle_name]);
         }
 
         $form['settings'][$entity_type_id . '_bundles'][$entity_type_id . '_' . $bundle_name] = [
           '#title' => $label,
-          '#description' => $this->t('Select the Version field.'),
+          '#description' => $this->t('Select a main Version field for this bundle.'),
           '#type' => 'select',
           '#options' => $field_labels[$entity_type_id][$bundle_name],
-          '#access' => $access,
+          '#disabled' => $disabled,
           '#states' => [
             'visible' => [
               ':input[name="entity_types[' . $entity_type_id . ']"]' => ['checked' => TRUE],
@@ -257,7 +255,7 @@ class EntityVersionSettingsForm extends FormBase {
       }
     }
 
-    $this->messenger->addStatus($this->t('The Entity Version configuration has been saved.'));
+    $this->messenger->addStatus($this->t('The Entity version configuration has been saved.'));
   }
 
 }

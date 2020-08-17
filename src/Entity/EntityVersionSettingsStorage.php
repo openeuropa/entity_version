@@ -35,7 +35,7 @@ class EntityVersionSettingsStorage extends ConfigEntityStorage {
   protected $routeBuilder;
 
   /**
-   * Constructs a ShortcutSetStorageController object.
+   * Constructs a EntityVersionSettingsStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
    *   The entity info for the entity type.
