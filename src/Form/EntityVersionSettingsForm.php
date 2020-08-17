@@ -100,16 +100,6 @@ class EntityVersionSettingsForm extends FormBase {
     foreach ($versioned_entity_types as $entity_type_id => $fields) {
       $definition = $this->entityTypeManager->getDefinition($entity_type_id);
 
-      if (!$definition->hasLinkTemplate('canonical')) {
-        // We are only interested in entity types that have a canonical URL.
-        continue;
-      }
-
-      if (!$definition->isRevisionable()) {
-        // We are only interested in entity types that can have revisions.
-        continue;
-      }
-
       // We need a list of options with labels for the form checkboxes.
       $entity_labels[$entity_type_id] = $definition->getLabel() ?: $entity_type_id;
 
