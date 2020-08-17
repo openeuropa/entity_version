@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install and update functions for the Entity Version module.
+ * Install and update functions for the Entity version module.
  */
 
 declare(strict_types = 1);
