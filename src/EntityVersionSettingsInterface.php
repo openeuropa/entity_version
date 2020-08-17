@@ -26,7 +26,7 @@ interface EntityVersionSettingsInterface extends ConfigEntityInterface {
    *   The entity type id.
    *
    * @return $this
-   *   Returns the EntityVersionSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
   public function setTargetEntityTypeId(string $target_entity_type_id): EntityVersionSettingsInterface;
 
@@ -45,7 +45,7 @@ interface EntityVersionSettingsInterface extends ConfigEntityInterface {
    *   The bundle.
    *
    * @return $this
-   *   Returns the EntityVersionSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
   public function setTargetBundle(string $target_bundle): EntityVersionSettingsInterface;
 
@@ -64,7 +64,7 @@ interface EntityVersionSettingsInterface extends ConfigEntityInterface {
    *   The target version field machine name.
    *
    * @return $this
-   *   Returns the EntityVersionSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
   public function setTargetField(string $target_field): EntityVersionSettingsInterface;
 
