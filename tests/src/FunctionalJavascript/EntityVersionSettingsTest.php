@@ -167,7 +167,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
     $this->assertCount(1, $config_entities);
 
     // Select a different field for the remaining bundle config.
-    $select->selectOption('Secondary version');
+    $this->getSession()->getPage()->findField('node_second_bundle')->selectOption('Secondary version');
     $page->pressButton('Save configuration');
 
     // Assert that the correct option is selected.
