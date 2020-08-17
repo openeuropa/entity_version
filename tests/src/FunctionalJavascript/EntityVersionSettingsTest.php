@@ -42,7 +42,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
 
     // Create user.
     $this->adminUser = $this->drupalCreateUser([
-      'access entity version configuration',
+      'administer entity version configuration',
       'access administration pages',
     ]);
     $this->drupalLogin($this->adminUser);
