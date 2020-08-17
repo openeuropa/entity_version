@@ -24,7 +24,7 @@ field.formatter.settings.entity_version:
 
 entity_version.settings.*.*:
   type: config_entity
-  label: 'Entity Version Settings'
+  label: 'Entity version Settings'
   mapping:
     id:
       type: string
