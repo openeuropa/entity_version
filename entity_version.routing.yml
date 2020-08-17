@@ -10,6 +10,6 @@ entity_version.settings:
   path: '/admin/config/entity-version/settings'
   defaults:
     _form: '\Drupal\entity_version\Form\EntityVersionSettingsForm'
-    _title: 'Entity Version settings'
+    _title: 'Entity version settings'
   requirements:
-    _permission: 'access entity version configuration'
+    _permission: 'administer entity version configuration'
