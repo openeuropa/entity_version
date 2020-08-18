@@ -1,15 +1,21 @@
 # Entity version
 
-The Entity Version module attaches a version number to content entity revisions that helps content editors to understand the evolution of the content item.\
+The Entity Version module attaches a version number to content entities that helps content editors to understand the evolution of the content item.\
 Versions are composed of major, minor and patch numbers and can be changed manually or by third party modules.
 
-The module includes the "Entity version workflows" sub-module which allows configuration and control of version numbers through workflow state transitions.
+## Sub-modules
+* [Entity version workflows](./modules/entity_version_workflows/README.md): this module allows configuration and control
+of version numbers through workflow state transitions.
+* [Entity version history](./modules/entity_version_history/README.md): module provides a "History" tab for content entities that have a version field in order to
+visualise the versions in a table format.
 
-## Configurations
-It provides a configuration page found at "admin/config/entity-version/settings" where an appropriate Version field can be selected for entities and their bundles that have at least one Version field which will be used as target for functionalities provided by sub-modules.
+## Configuration
+This module provides a configuration page found at "admin/config/entity-version/settings" where an appropriate version
+field can be selected for entities and their bundles that have at least one version field.\
+Those fields will be then used as target for functionalities provided by sub-modules.
 
 ## Permissions
-This module provides a permission called `administer entity version configuration` which permits configuring the version settings.
+This module provides a permission called `administer entity version configuration` which allows configuring the module settings.
 
 ## Development setup
 
