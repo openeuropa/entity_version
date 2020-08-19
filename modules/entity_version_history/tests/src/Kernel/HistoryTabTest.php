@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_version_history\Kernel;
 
+use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
@@ -28,6 +29,7 @@ class HistoryTabTest extends KernelTestBase {
     'field',
     'text',
     'system',
+    'entity_test',
     'entity_version',
     'entity_version_history',
     'entity_version_test',
@@ -44,6 +46,8 @@ class HistoryTabTest extends KernelTestBase {
     $this->installEntitySchema('entity_version_settings');
     $this->installSchema('system', 'sequences');
     $this->installSchema('node', 'node_access');
+    $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEntitySchema('entity_test_bundle');
 
     $this->installConfig([
       'user',
@@ -55,6 +59,12 @@ class HistoryTabTest extends KernelTestBase {
       'entity_version_test',
     ]);
 
+    EntityTestBundle::create([
+      'id' => 'entity_test_bundle',
+    ])->save();
+
+    $this->container->get('entity_version.entity_version_installer')->install('entity_test_with_bundle', ['entity_test_bundle']);
+
     // Create a history tab setting for the corresponding entity type
     // and bundle.
     $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_settings');
@@ -62,6 +72,14 @@ class HistoryTabTest extends KernelTestBase {
       'target_entity_type_id' => 'node',
       'target_bundle' => 'first_bundle',
       'target_field' => 'field_entity_version',
+    ])->save();
+    // Create a configuration for the entity type and bundle which still
+    // not supposed to have a history tab route.
+    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_settings');
+    $history_storage->create([
+      'target_entity_type_id' => 'entity_test_with_bundle',
+      'target_bundle' => 'entity_test_bundle',
+      'target_field' => 'version',
     ])->save();
   }
 
@@ -84,6 +102,9 @@ class HistoryTabTest extends KernelTestBase {
         continue;
       }
 
+      // An entity that does not have canonical URL or is not revisionable
+      // should not have 'entity-version-history' link template and
+      // related route even if it has entity version configuration.
       $this->assertFalse($definition->hasLinkTemplate('entity-version-history'));
 
       $exception = NULL;
