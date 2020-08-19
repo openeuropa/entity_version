@@ -31,7 +31,7 @@ entity_version.settings.*.*:
       label: 'ID'
     target_entity_type_id:
       type: string
-      label: 'Entity Type ID'
+      label: 'Entity type ID'
     target_bundle:
       type:  string
       label: 'Bundle'
