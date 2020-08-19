@@ -84,11 +84,31 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
     // Check the bundle checkbox is visible for test entity.
     $this->assertTrue($test_entity_bundle_checkbox->isVisible());
 
-    // Check that there is only one select field and it's not visible.
+    // Check that there are three invisible select fields
+    // and only one of them is not disabled.
     $selects = $page->findAll('css', 'details select');
     $this->assertCount(3, $selects);
-    $select = reset($selects);
-    $this->assertEquals('entity_test_rev_entity_test_rev', $select->getAttribute('name'));
+    $select_boxes = [
+      [
+        'name' => 'entity_test_rev_entity_test_rev',
+        'disabled' => 'disabled',
+      ],
+      [
+        'name' => 'node_first_bundle',
+        'disabled' => 'disabled',
+      ],
+      [
+        'name' => 'node_second_bundle',
+        'disabled' => NULL,
+      ],
+    ];
+    foreach ($select_boxes as $index => $select_box) {
+      $this->assertFalse($selects[$index]->isVisible());
+      $this->assertEqual($selects[$index]->getAttribute('name'), $select_box['name']);
+      $this->assertEqual($selects[$index]->getAttribute('disabled'), $select_box['disabled']);
+    }
+    $select = end($selects);
+    $this->assertEquals('node_second_bundle', $select->getAttribute('name'));
     $this->assertFalse($select->isVisible());
 
     // Assert that the correct options are present in the field.
