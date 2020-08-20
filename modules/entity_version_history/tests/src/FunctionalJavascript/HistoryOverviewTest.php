@@ -45,7 +45,7 @@ class HistoryOverviewTest extends WebDriverTestBase {
 
     // Create user.
     $this->adminUser = $this->drupalCreateUser([
-      'administer entity version configuration',
+      'administer entity version',
       'access administration pages',
       'access entity version history',
       'edit any first_bundle content',
