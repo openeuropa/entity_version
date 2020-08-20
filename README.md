@@ -15,7 +15,7 @@ field can be selected for entities and their bundles that have at least one vers
 Those fields will be then used as target for functionalities provided by sub-modules.
 
 ## Permissions
-This module provides a permission called `administer entity version configuration` which allows configuring the module settings.
+This module provides a permission called `administer entity version` which allows configuring the module settings.
 
 ## Development setup
 

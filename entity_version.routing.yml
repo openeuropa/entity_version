@@ -12,4 +12,4 @@ entity_version.settings:
     _form: '\Drupal\entity_version\Form\EntityVersionSettingsForm'
     _title: 'Entity version settings'
   requirements:
-    _permission: 'administer entity version configuration'
+    _permission: 'administer entity version'
