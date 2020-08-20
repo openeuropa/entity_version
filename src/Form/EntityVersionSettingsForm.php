@@ -127,7 +127,7 @@ class EntityVersionSettingsForm extends FormBase {
 
     $form['description'] = [
       '#type' => 'item',
-      '#markup' => $this->t('For each entity type and bundle that have at least one Entity version field, configure which field should be marked as main. Said fields will be used to apply functionalities offered by sub-modules. If no choice is made for a bundle, said functionalities will be disabled.'),
+      '#markup' => $this->t('For each entity type and bundle that have at least one Entity version field, configure which field should be marked as main. Said fields will be used to apply functionalities offered by sub-modules.'),
     ];
 
     // Create checkboxes for all entity types.
