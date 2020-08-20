@@ -28,7 +28,7 @@ function entity_version_history_entity_type_alter(array &$entity_types) {
     if (!$entity_types[$entity_type]->getLinkTemplate('canonical') || !$entity_types[$entity_type]->isRevisionable()) {
       // We are only interested in entity types which have a canonical URL
       // and can have revisions.
-      return;
+      continue;
     }
 
     $history_path = $entity_types[$entity_type]->getLinkTemplate('canonical') . '/history';
