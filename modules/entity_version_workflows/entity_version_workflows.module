@@ -118,14 +118,18 @@ function entity_version_workflows_entity_presave(EntityInterface $entity) {
     return;
   }
 
-  $bundle_fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle());
-  foreach ($bundle_fields as $field) {
-    /** @var \Drupal\field\Entity\FieldConfig $field */
-    if ($field->getType() === 'entity_version') {
-      /** @var \Drupal\entity_version_workflows\EntityVersionWorkflowManager $entity_version_manager */
-      $entity_version_handler = \Drupal::service('entity_version_workflows.entity_version_workflow_manager');
-      $entity_version_handler->updateEntityVersion($entity, $field->getName());
-      break;
-    }
+  $entity_version_storage = \Drupal::service('entity_type.manager')->getStorage('entity_version_settings');
+  $version_field_setting = $entity_version_storage->load($entity->getEntityTypeId() . '.' . $entity->bundle());
+  if (!$version_field_setting) {
+    return;
   }
+
+  $version_field = $version_field_setting->getTargetField();
+  if (empty($version_field)) {
+    return;
+  }
+
+  /** @var \Drupal\entity_version_workflows\EntityVersionWorkflowManager $entity_version_manager */
+  $entity_version_handler = \Drupal::service('entity_version_workflows.entity_version_workflow_manager');
+  $entity_version_handler->updateEntityVersion($entity, $version_field);
 }

@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_version_history;
+namespace Drupal\entity_version;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining history tabs settings for content entities.
+ * Provides an interface defining entity version settings for content entities.
  */
-interface HistoryTabSettingsInterface extends ConfigEntityInterface {
+interface EntityVersionSettingsInterface extends ConfigEntityInterface {
 
   /**
    * Gets the entity type ID this config applies to.
@@ -26,9 +26,9 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
    *   The entity type id.
    *
    * @return $this
-   *   Returns the HistoryTabSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
-  public function setTargetEntityTypeId(string $target_entity_type_id): HistoryTabSettingsInterface;
+  public function setTargetEntityTypeId(string $target_entity_type_id): EntityVersionSettingsInterface;
 
   /**
    * Gets the bundle this config applies to.
@@ -45,9 +45,9 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
    *   The bundle.
    *
    * @return $this
-   *   Returns the HistoryTabSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
-  public function setTargetBundle(string $target_bundle): HistoryTabSettingsInterface;
+  public function setTargetBundle(string $target_bundle): EntityVersionSettingsInterface;
 
   /**
    * Gets the target version field machine name.
@@ -64,8 +64,8 @@ interface HistoryTabSettingsInterface extends ConfigEntityInterface {
    *   The target version field machine name.
    *
    * @return $this
-   *   Returns the HistoryTabSettings object.
+   *   Returns an EntityVersionSettingsInterface instance.
    */
-  public function setTargetField(string $target_field): HistoryTabSettingsInterface;
+  public function setTargetField(string $target_field): EntityVersionSettingsInterface;
 
 }

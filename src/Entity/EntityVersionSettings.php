@@ -2,30 +2,30 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_version_history\Entity;
+namespace Drupal\entity_version\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\entity_version_history\HistoryTabSettingsInterface;
+use Drupal\entity_version\EntityVersionSettingsInterface;
 use Drupal\field\FieldConfigInterface;
 
 /**
- * Defines the HistoryTabSettings entity type.
+ * Defines the EntityVersionSettings entity type.
  *
  * @ConfigEntityType(
- *   id = "entity_version_history_settings",
+ *   id = "entity_version_settings",
  *   handlers = {
- *     "storage" = "Drupal\entity_version_history\Entity\HistoryTabSettingsStorage",
+ *     "storage" = "Drupal\entity_version\Entity\EntityVersionSettingsStorage",
  *   },
- *   label = @Translation("Entity Version History Settings"),
- *   label_collection = @Translation("Entity Version History Settings"),
- *   label_singular = @Translation("entity version history setting"),
- *   label_plural = @Translation("entity version history settings"),
+ *   label = @Translation("Entity Version Settings"),
+ *   label_collection = @Translation("Entity Version Settings"),
+ *   label_singular = @Translation("entity version setting"),
+ *   label_plural = @Translation("entity version settings"),
  *   label_count = @PluralTranslation(
- *     singular = "@count entity version history setting",
- *     plural = "@count entity version history settings",
+ *     singular = "@count entity version setting",
+ *     plural = "@count entity version settings",
  *   ),
- *   admin_permission = "access entity version history configuration",
+ *   admin_permission = "administer entity version",
  *   config_prefix = "settings",
  *   entity_keys = {
  *     "id" = "id"
@@ -38,7 +38,7 @@ use Drupal\field\FieldConfigInterface;
  *   }
  * )
  */
-class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsInterface {
+class EntityVersionSettings extends ConfigEntityBase implements EntityVersionSettingsInterface {
 
   /**
    * The id. Combination of $target_entity_type_id.$target_bundle.
@@ -69,7 +69,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   protected $target_field;
 
   /**
-   * Constructs a HistoryTabSettings object.
+   * Constructs a EntityVersionSettings object.
    *
    * @param array $values
    *   An array of the referring entity bundle with:
@@ -80,12 +80,12 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
    * @param string $entity_type
    *   The entity type id.
    */
-  public function __construct(array $values, string $entity_type = 'entity_version_history_settings') {
+  public function __construct(array $values, string $entity_type = 'entity_version_settings') {
     if (empty($values['target_entity_type_id'])) {
-      throw new \InvalidArgumentException('Attempt to create entity version history settings without a target_entity_type_id.');
+      throw new \InvalidArgumentException('Attempt to create entity version settings without a target_entity_type_id.');
     }
     if (empty($values['target_bundle'])) {
-      throw new \InvalidArgumentException('Attempt to create entity version history settings without a target_bundle.');
+      throw new \InvalidArgumentException('Attempt to create entity version settings without a target_bundle.');
     }
     parent::__construct($values, $entity_type);
   }
@@ -109,7 +109,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   /**
    * {@inheritdoc}
    */
-  public function setTargetEntityTypeId(string $target_entity_type_id): HistoryTabSettingsInterface {
+  public function setTargetEntityTypeId(string $target_entity_type_id): EntityVersionSettingsInterface {
     $this->target_entity_type_id = $target_entity_type_id;
     return $this;
   }
@@ -124,7 +124,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   /**
    * {@inheritdoc}
    */
-  public function setTargetBundle(string $target_bundle): HistoryTabSettingsInterface {
+  public function setTargetBundle(string $target_bundle): EntityVersionSettingsInterface {
     $this->target_bundle = $target_bundle;
     return $this;
   }
@@ -139,7 +139,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   /**
    * {@inheritdoc}
    */
-  public function setTargetField(string $target_field): HistoryTabSettingsInterface {
+  public function setTargetField(string $target_field): EntityVersionSettingsInterface {
     $this->target_field = $target_field;
     return $this;
   }
@@ -155,7 +155,7 @@ class HistoryTabSettings extends ConfigEntityBase implements HistoryTabSettingsI
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies(): HistoryTabSettingsInterface {
+  public function calculateDependencies(): EntityVersionSettingsInterface {
     parent::calculateDependencies();
 
     // Create dependency on the bundle.

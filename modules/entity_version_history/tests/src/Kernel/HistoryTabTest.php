@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_version_history\Kernel;
 
+use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
@@ -28,9 +29,10 @@ class HistoryTabTest extends KernelTestBase {
     'field',
     'text',
     'system',
+    'entity_test',
     'entity_version',
     'entity_version_history',
-    'entity_version_history_test',
+    'entity_version_test',
   ];
 
   /**
@@ -41,9 +43,11 @@ class HistoryTabTest extends KernelTestBase {
 
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
-    $this->installEntitySchema('entity_version_history_settings');
+    $this->installEntitySchema('entity_version_settings');
     $this->installSchema('system', 'sequences');
     $this->installSchema('node', 'node_access');
+    $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEntitySchema('entity_test_bundle');
 
     $this->installConfig([
       'user',
@@ -52,16 +56,30 @@ class HistoryTabTest extends KernelTestBase {
       'field',
       'entity_version',
       'entity_version_history',
-      'entity_version_history_test',
+      'entity_version_test',
     ]);
+
+    EntityTestBundle::create([
+      'id' => 'entity_test_bundle',
+    ])->save();
+
+    $this->container->get('entity_version.entity_version_installer')->install('entity_test_with_bundle', ['entity_test_bundle']);
 
     // Create a history tab setting for the corresponding entity type
     // and bundle.
-    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_history_settings');
+    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_settings');
     $history_storage->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'first_bundle',
       'target_field' => 'field_entity_version',
+    ])->save();
+    // Create a configuration for the entity type and bundle which still
+    // not supposed to have a history tab route.
+    $history_storage = $this->container->get('entity_type.manager')->getStorage('entity_version_settings');
+    $history_storage->create([
+      'target_entity_type_id' => 'entity_test_with_bundle',
+      'target_bundle' => 'entity_test_bundle',
+      'target_field' => 'version',
     ])->save();
   }
 
@@ -84,6 +102,9 @@ class HistoryTabTest extends KernelTestBase {
         continue;
       }
 
+      // An entity that does not have canonical URL or is not revisionable
+      // should not have 'entity-version-history' link template and
+      // related route even if it has entity version configuration.
       $this->assertFalse($definition->hasLinkTemplate('entity-version-history'));
 
       $exception = NULL;
@@ -127,8 +148,8 @@ class HistoryTabTest extends KernelTestBase {
       'user.permissions',
     ];
     $cache_tags = [
-      'config:entity_version_history.settings.' . $node->getEntityTypeId() . '.' . $node->bundle(),
-      'config:entity_version_history_settings_list',
+      'config:entity_version.settings.' . $node->getEntityTypeId() . '.' . $node->bundle(),
+      'config:entity_version_settings_list',
       $node->getEntityTypeId() . ':' . $node->id(),
     ];
 
@@ -148,7 +169,7 @@ class HistoryTabTest extends KernelTestBase {
 
     // Remove the corresponding history config.
     $entity_type_manager
-      ->getStorage('entity_version_history_settings')
+      ->getStorage('entity_version_settings')
       ->load('node.first_bundle')
       ->delete();
 
@@ -157,7 +178,7 @@ class HistoryTabTest extends KernelTestBase {
       'route',
     ];
     $cache_tags = [
-      'config:entity_version_history_settings_list',
+      'config:entity_version_settings_list',
       $node->getEntityTypeId() . ':' . $node->id(),
     ];
 
@@ -165,7 +186,7 @@ class HistoryTabTest extends KernelTestBase {
     // history config.
     $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_with_permission, TRUE);
     $this->assertTrue($access_result->isForbidden());
-    $this->assertEquals('No history settings found for this entity type and bundle.', $access_result->getReason());
+    $this->assertEquals('No version settings found for this entity type and bundle.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
     $this->assertEquals($cache_tags, $access_result->getCacheTags());
   }

@@ -1,9 +1,21 @@
 # Entity version
 
-The Entity Version module attaches a version number to content entity revisions that helps content editors to understand the evolution of the content item. 
+The Entity Version module attaches a version number to content entities that helps content editors to understand the evolution of the content item.\
 Versions are composed of major, minor and patch numbers and can be changed manually or by third party modules.
 
-The module includes the "Entity version workflows" sub-module which allows configuration and control of version numbers through workflow state transitions.
+## Sub-modules
+* [Entity version workflows](./modules/entity_version_workflows/README.md): this module allows configuration and control
+of version numbers through workflow state transitions.
+* [Entity version history](./modules/entity_version_history/README.md): module provides a "History" tab for content entities that have a version field in order to
+visualise the versions in a table format.
+
+## Configuration
+This module provides a configuration page found at "admin/config/entity-version/settings" where an appropriate version
+field can be selected for entities and their bundles that have at least one version field.\
+Those fields will be then used as target for functionalities provided by sub-modules.
+
+## Permissions
+This module provides a permission called `administer entity version` which allows configuring the module settings.
 
 ## Development setup
 
@@ -29,11 +41,9 @@ The development site web root should be available in the `build` directory.
 
 ### Using Docker Compose
 
-Alternatively, you can build a development site using [Docker](https://www.docker.com/get-docker) and 
-[Docker Compose](https://docs.docker.com/compose/) with the provided configuration.
+Alternatively, you can build a development site using [Docker](https://www.docker.com/get-docker) and [Docker Compose](https://docs.docker.com/compose/) with the provided configuration.
 
-Docker provides the necessary services and tools such as a web server and a database server to get the site running, 
-regardless of your local host configuration.
+Docker provides the necessary services and tools such as a web server and a database server to get the site running, regardless of your local host configuration.
 
 #### Requirements:
 
@@ -44,8 +54,7 @@ regardless of your local host configuration.
 
 By default, Docker Compose reads two files, a `docker-compose.yml` and an optional `docker-compose.override.yml` file.
 By convention, the `docker-compose.yml` contains your base configuration and it's provided by default.
-The override file, as its name implies, can contain configuration overrides for existing services or entirely new 
-services.
+The override file, as its name implies, can contain configuration overrides for existing services or entirely new services.
 If a service is defined in both files, Docker Compose merges the configurations.
 
 Find more information on Docker Compose extension mechanism on [the official Docker Compose documentation](https://docs.docker.com/compose/extends/).

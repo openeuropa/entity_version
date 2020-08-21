@@ -1,10 +1,10 @@
-name: Entity Version History Test
-description: Test module to test the entity version history functionalities.
+name: Entity Version Test
+description: Test module to test the entity version functionalities.
 type: module
 core: 8.x
 
 dependencies:
-  - entity_version_history:entity_version_history
+  - entity_version:entity_version
 
 config_devel:
   install:

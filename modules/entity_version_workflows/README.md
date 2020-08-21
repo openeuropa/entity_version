@@ -15,3 +15,7 @@ by setting the custom property "entity_version_no_update" to TRUE.
 ```
 $entity->entity_version_no_update = TRUE;
 ```
+
+## Configuration
+A version field needs to be selected in the entity version configuration at "admin/config/entity-version/settings" to
+apply the transition changes for that specific entity bundle. If no field is selected, no changes to version fields will apply.

@@ -2,18 +2,18 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\Tests\entity_version_history\Functional;
+namespace Drupal\Tests\entity_version\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 
 /**
- * Ensures the entity version history config is correctly saved.
+ * Ensures the entity version config is correctly saved.
  *
- * @group entity_version_history
+ * @group entity_version
  */
-class HistoryTabSettingsTest extends WebDriverTestBase {
+class EntityVersionSettingsTest extends WebDriverTestBase {
 
   use SchemaCheckTestTrait;
 
@@ -24,8 +24,7 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     'node',
     'entity_test',
     'entity_version',
-    'entity_version_history',
-    'entity_version_history_test',
+    'entity_version_test',
   ];
 
   /**
@@ -43,17 +42,17 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
 
     // Create user.
     $this->adminUser = $this->drupalCreateUser([
-      'access entity version history configuration',
+      'administer entity version',
       'access administration pages',
     ]);
     $this->drupalLogin($this->adminUser);
   }
 
   /**
-   * Tests whether the history settings form is correctly saving the settings.
+   * Tests whether the entity version settings form is correctly saved.
    */
-  public function testHistoryTabSettingsForm() {
-    $this->drupalGet('admin/config/entity-version/history-tab');
+  public function testEntityVersionSettingsForm() {
+    $this->drupalGet('admin/config/entity-version/settings');
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -73,7 +72,8 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     // Check the content entity type checkbox.
     $node_entity_checkbox->check();
 
-    // Check the bundle checkboxes are now visible except the history bundle.
+    // Check the bundle checkboxes are now visible except
+    // the entity_test_rev bundle.
     $this->assertTrue($first_bundle_checkbox->isVisible());
     $this->assertTrue($second_bundle_checkbox->isVisible());
     $this->assertFalse($test_entity_bundle_checkbox->isVisible());
@@ -84,15 +84,35 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     // Check the bundle checkbox is visible for test entity.
     $this->assertTrue($test_entity_bundle_checkbox->isVisible());
 
-    // Check that there is only one select field and it's not visible.
+    // Check that there are three invisible select fields
+    // and only one of them is not disabled.
     $selects = $page->findAll('css', 'details select');
-    $this->assertCount(1, $selects);
-    $select = reset($selects);
+    $this->assertCount(3, $selects);
+    $select_boxes = [
+      [
+        'name' => 'entity_test_rev_entity_test_rev',
+        'disabled' => 'disabled',
+      ],
+      [
+        'name' => 'node_first_bundle',
+        'disabled' => 'disabled',
+      ],
+      [
+        'name' => 'node_second_bundle',
+        'disabled' => NULL,
+      ],
+    ];
+    foreach ($select_boxes as $index => $select_box) {
+      $this->assertFalse($selects[$index]->isVisible());
+      $this->assertEqual($selects[$index]->getAttribute('name'), $select_box['name']);
+      $this->assertEqual($selects[$index]->getAttribute('disabled'), $select_box['disabled']);
+    }
+    $select = end($selects);
     $this->assertEquals('node_second_bundle', $select->getAttribute('name'));
     $this->assertFalse($select->isVisible());
 
     // Assert that the correct options are present in the field.
-    $this->assertFieldSelectOptions('History second bundle', [
+    $this->assertFieldSelectOptions('Second bundle', [
       'field_entity_version',
       'field_secondary_version',
     ]);
@@ -108,11 +128,11 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $page->pressButton('Save configuration');
 
     $status_message = $assert_session->waitForElement('css', '.messages--status');
-    $this->assertEquals('Status message The Version history configuration has been saved.', $status_message->getText());
+    $this->assertEquals('Status message The Entity version configuration has been saved.', $status_message->getText());
 
     // Check that there are only 3 config entities created.
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
-    $storage = \Drupal::service('entity_type.manager')->getStorage('entity_version_history_settings');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('entity_version_settings');
     $config_entities = $storage->loadMultiple();
     $this->assertCount(3, $config_entities);
 
@@ -128,19 +148,19 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertTrue($option_field->hasAttribute('selected'));
 
     // Make sure configuration saved correctly and complies with the schema.
-    $config = $this->config('entity_version_history.settings.node.first_bundle');
+    $config = $this->config('entity_version.settings.node.first_bundle');
     $this->assertEquals('node', $config->get('target_entity_type_id'));
     $this->assertEquals('first_bundle', $config->get('target_bundle'));
     $this->assertEquals('field_entity_version', $config->get('target_field'));
     $this->assertConfigSchema($this->container->get('config.typed'), $config->getName(), $config->get());
 
-    $config = $this->config('entity_version_history.settings.node.second_bundle');
+    $config = $this->config('entity_version.settings.node.second_bundle');
     $this->assertEquals('node', $config->get('target_entity_type_id'));
     $this->assertEquals('second_bundle', $config->get('target_bundle'));
     $this->assertEquals('field_entity_version', $config->get('target_field'));
     $this->assertConfigSchema($this->container->get('config.typed'), $config->getName(), $config->get());
 
-    $config = $this->config('entity_version_history.settings.entity_test_rev.entity_test_rev');
+    $config = $this->config('entity_version.settings.entity_test_rev.entity_test_rev');
     $this->assertEquals('entity_test_rev', $config->get('target_entity_type_id'));
     $this->assertEquals('entity_test_rev', $config->get('target_bundle'));
     $this->assertEquals('version', $config->get('target_field'));
@@ -167,7 +187,7 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->assertCount(1, $config_entities);
 
     // Select a different field for the remaining bundle config.
-    $select->selectOption('Secondary version');
+    $this->getSession()->getPage()->findField('node_second_bundle')->selectOption('Secondary version');
     $page->pressButton('Save configuration');
 
     // Assert that the correct option is selected.
@@ -178,7 +198,7 @@ class HistoryTabSettingsTest extends WebDriverTestBase {
     $this->container->get('config.factory')->clearStaticCache();
     $config_entities = $storage->loadMultiple();
     $this->assertCount(1, $config_entities);
-    $config = $this->config('entity_version_history.settings.node.second_bundle');
+    $config = $this->config('entity_version.settings.node.second_bundle');
     $this->assertEquals('node', $config->get('target_entity_type_id'));
     $this->assertEquals('second_bundle', $config->get('target_bundle'));
     $this->assertEquals('field_secondary_version', $config->get('target_field'));

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_version_history\Entity;
+namespace Drupal\entity_version\Entity;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
@@ -16,9 +16,9 @@ use Drupal\Core\Routing\RouteBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Storage handler for "entity_version_history_settings" configuration entities.
+ * Storage handler for "entity_version_settings" configuration entities.
  */
-class HistoryTabSettingsStorage extends ConfigEntityStorage {
+class EntityVersionSettingsStorage extends ConfigEntityStorage {
 
   /**
    * The entity type manager.
@@ -35,7 +35,7 @@ class HistoryTabSettingsStorage extends ConfigEntityStorage {
   protected $routeBuilder;
 
   /**
-   * Constructs a ShortcutSetStorageController object.
+   * Constructs a EntityVersionSettingsStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
    *   The entity info for the entity type.

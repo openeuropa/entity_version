@@ -4,3 +4,10 @@ entity_version.index:
   route_name: entity_version.index
   description: 'Configure Entity Version.'
   weight: -10
+
+entity_version.settings:
+  title: 'Entity version'
+  route_name: entity_version.settings
+  parent: entity_version.index
+  description: 'Configure the module behaviour.'
+  weight: 0

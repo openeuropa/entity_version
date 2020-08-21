@@ -2,7 +2,7 @@
 
 /**
  * @file
- * The entity_version_history_test module.
+ * The entity_version_test module.
  */
 
 declare(strict_types = 1);
@@ -13,7 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 /**
  * Implements hook_entity_base_field_info().
  */
-function entity_version_history_test_entity_base_field_info(EntityTypeInterface $entity_type) {
+function entity_version_test_entity_base_field_info(EntityTypeInterface $entity_type) {
   $fields = [];
 
   if ($entity_type->id() !== 'entity_test_rev') {

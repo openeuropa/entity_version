@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_version_history\Form;
+namespace Drupal\entity_version\Form;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -13,9 +13,9 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Configure the history tab settings per content entity type and bundle.
+ * Configure the entity version settings per content entity type and bundle.
  */
-class HistoryTabSettingsForm extends FormBase {
+class EntityVersionSettingsForm extends FormBase {
 
   /**
    * The entity type manager.
@@ -46,7 +46,7 @@ class HistoryTabSettingsForm extends FormBase {
   protected $messenger;
 
   /**
-   * Constructs an HistoryTabSettingsForm object.
+   * Constructs an EntityVersionSettingsForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
@@ -80,7 +80,7 @@ class HistoryTabSettingsForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'entity_version_history_settings_form';
+    return 'entity_version_settings_form';
   }
 
   /**
@@ -93,22 +93,12 @@ class HistoryTabSettingsForm extends FormBase {
     $bundle_labels = [];
     $entity_labels = [];
     $field_labels = [];
-    $history_configs = [];
+    $entity_version_configs = [];
     // Get entity types and bundles where the entity_version field is present.
     $versioned_entity_types = $this->entityFieldManager->getFieldMapByFieldType('entity_version');
 
     foreach ($versioned_entity_types as $entity_type_id => $fields) {
       $definition = $this->entityTypeManager->getDefinition($entity_type_id);
-
-      if (!$definition->hasLinkTemplate('canonical')) {
-        // We are only interested in entity types that have a canonical URL.
-        continue;
-      }
-
-      if (!$definition->isRevisionable()) {
-        // We are only interested in entity types that can have revisions.
-        continue;
-      }
 
       // We need a list of options with labels for the form checkboxes.
       $entity_labels[$entity_type_id] = $definition->getLabel() ?: $entity_type_id;
@@ -122,11 +112,11 @@ class HistoryTabSettingsForm extends FormBase {
           $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle_name);
           $field_labels[$entity_type_id][$bundle_name][$field_name] = $field_definitions[$field_name]->getLabel();
 
-          if ($config = $this->entityTypeManager->getStorage('entity_version_history_settings')->load("$entity_type_id.$bundle_name")) {
+          if ($config = $this->entityTypeManager->getStorage('entity_version_settings')->load("$entity_type_id.$bundle_name")) {
             // Get the existing configs to pre-fill the form fields with
             // default values.
             if ($field_name === $config->getTargetField()) {
-              $history_configs[$entity_type_id][$bundle_name][$field_name] = $config->getTargetField();
+              $entity_version_configs[$entity_type_id][$bundle_name][$field_name] = $config->getTargetField();
             }
           }
         }
@@ -137,15 +127,14 @@ class HistoryTabSettingsForm extends FormBase {
 
     $form['description'] = [
       '#type' => 'item',
-      '#markup' => $this->t('Configure on which entity type and bundle you would like the Version history tab to show up.'),
+      '#markup' => $this->t('For each entity type and bundle that have at least one Entity version field, configure which field should be marked as main. Said fields will be used to apply functionalities offered by sub-modules.'),
     ];
 
     // Create checkboxes for all entity types.
     $form['entity_types'] = [
-      '#title' => $this->t('Entity types that have a Version field'),
       '#type' => 'checkboxes',
       '#options' => $entity_labels,
-      '#default_value' => isset($history_configs) ? array_keys($history_configs) : [],
+      '#default_value' => isset($entity_version_configs) ? array_keys($entity_version_configs) : [],
     ];
 
     // Create checkboxes for all bundles.
@@ -153,7 +142,6 @@ class HistoryTabSettingsForm extends FormBase {
       $form['settings'][$entity_type_id . '_bundles'] = [
         '#type' => 'details',
         '#title' => $entity_labels[$entity_type_id],
-        '#description' => $this->t('The bundles that have a Version field.'),
         '#open' => TRUE,
         '#states' => [
           'visible' => [
@@ -165,34 +153,34 @@ class HistoryTabSettingsForm extends FormBase {
         '#title' => $this->t('Bundles'),
         '#type' => 'checkboxes',
         '#options' => $bundles,
-        '#default_value' => isset($history_configs[$entity_type_id]) ? array_keys($history_configs[$entity_type_id]) : [],
+        '#default_value' => isset($entity_version_configs[$entity_type_id]) ? array_keys($entity_version_configs[$entity_type_id]) : [],
       ];
 
       // Create select list of the version fields in the bundle.
       foreach ($bundles as $bundle_name => $label) {
-        $access = TRUE;
+        $disabled = FALSE;
         $default_value = [];
 
         if (count($field_labels[$entity_type_id][$bundle_name]) === 1) {
           // Remove access if there is only one version field and
           // set the default_value for the form field.
-          $access = FALSE;
+          $disabled = TRUE;
           $default_value = key($field_labels[$entity_type_id][$bundle_name]);
         }
 
         $form['settings'][$entity_type_id . '_bundles'][$entity_type_id . '_' . $bundle_name] = [
           '#title' => $label,
-          '#description' => $this->t('Select the Version field to use for building the history tab.'),
+          '#description' => $this->t('Select a main Version field for this bundle.'),
           '#type' => 'select',
           '#options' => $field_labels[$entity_type_id][$bundle_name],
-          '#access' => $access,
+          '#disabled' => $disabled,
           '#states' => [
             'visible' => [
               ':input[name="entity_types[' . $entity_type_id . ']"]' => ['checked' => TRUE],
               ':input[name="' . $entity_type_id . '[' . $bundle_name . ']"]' => ['checked' => TRUE],
             ],
           ],
-          '#default_value' => isset($history_configs[$entity_type_id][$bundle_name]) ? key($history_configs[$entity_type_id][$bundle_name]) : $default_value,
+          '#default_value' => isset($entity_version_configs[$entity_type_id][$bundle_name]) ? key($entity_version_configs[$entity_type_id][$bundle_name]) : $default_value,
         ];
       }
     }
@@ -213,19 +201,19 @@ class HistoryTabSettingsForm extends FormBase {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $history_storage = $this->entityTypeManager->getStorage('entity_version_history_settings');
+    $entity_version_storage = $this->entityTypeManager->getStorage('entity_version_settings');
     foreach ($form_state->getValue('entity_types') as $target_entity_type_id => $entity_id_value) {
       if (!$entity_id_value) {
         // Delete all existing config settings with this entity id if the
         // entity type (top level) checkbox is unchecked in the form.
-        if ($configs = $history_storage->loadByProperties(['target_entity_type_id' => $target_entity_type_id])) {
-          $history_storage->delete($configs);
+        if ($configs = $entity_version_storage->loadByProperties(['target_entity_type_id' => $target_entity_type_id])) {
+          $entity_version_storage->delete($configs);
           continue;
         }
       }
 
       foreach ($form_state->getValue($target_entity_type_id) as $target_bundle => $bundle_value) {
-        $config = $history_storage->load("$target_entity_type_id.$target_bundle");
+        $config = $entity_version_storage->load("$target_entity_type_id.$target_bundle");
         if (!$bundle_value && $config) {
           // Delete the existing config entities with this target entity id
           // and bundle if the bundle checkbox is unchecked in the form.
@@ -248,7 +236,7 @@ class HistoryTabSettingsForm extends FormBase {
         if ($target_field && $bundle_value) {
           // If we have a target field and a bundle is checked, we create
           // the new config entity.
-          $history_storage->create([
+          $entity_version_storage->create([
             'target_entity_type_id' => $target_entity_type_id,
             'target_bundle' => $target_bundle,
             'target_field' => $target_field,
@@ -257,7 +245,7 @@ class HistoryTabSettingsForm extends FormBase {
       }
     }
 
-    $this->messenger->addStatus($this->t('The Version history configuration has been saved.'));
+    $this->messenger->addStatus($this->t('The Entity version configuration has been saved.'));
   }
 
 }
