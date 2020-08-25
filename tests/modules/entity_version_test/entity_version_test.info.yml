@@ -1,0 +1,17 @@
+name: Entity Version Test
+description: Test module to test the entity version functionalities.
+type: module
+core: 8.x
+
+dependencies:
+  - entity_version:entity_version
+
+config_devel:
+  install:
+    - field.field.node.first_bundle.field_entity_version
+    - field.field.node.second_bundle.field_entity_version
+    - field.field.node.second_bundle.field_secondary_version
+    - field.storage.node.field_entity_version
+    - field.storage.node.field_secondary_version
+    - node.type.first_bundle
+    - node.type.second_bundle
