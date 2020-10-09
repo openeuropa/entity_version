@@ -1,11 +1,18 @@
-# Changelog
+# Change Log
+
+## [8.x-1.0-beta5](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta5) (2020-10-09)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta4...8.x-1.0-beta5)
+
+**Merged pull requests:**
+
+- EWPP-000: Updating .info file. [\#37](https://github.com/openeuropa/entity_version/pull/37) ([upchuk](https://github.com/upchuk))
 
 ## [8.x-1.0-beta4](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta4) (2020-10-01)
-
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta3...8.x-1.0-beta4)
 
 **Merged pull requests:**
 
+- Prepare release 8.x-1.0-beta4. [\#36](https://github.com/openeuropa/entity_version/pull/36) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-200: Upgrade path to create default entity version settings. [\#35](https://github.com/openeuropa/entity_version/pull/35) ([nagyad](https://github.com/nagyad))
 - OPENEUROPA-2964: Merge history epic. [\#34](https://github.com/openeuropa/entity_version/pull/34) ([nagyad](https://github.com/nagyad))
 
