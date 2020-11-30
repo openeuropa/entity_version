@@ -55,3 +55,11 @@ function entity_version_post_update_configure_settings() {
     }
   }
 }
+
+/**
+ * Install Entity Version Settings config entity type.
+ */
+function entity_version_post_update_install_entity_version_settings_entity_type(): void {
+  $entity_type = \Drupal::entityTypeManager()->getDefinition('entity_version_settings');
+  \Drupal::entityDefinitionUpdateManager()->installEntityType($entity_type);
+}
