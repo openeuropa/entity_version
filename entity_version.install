@@ -51,7 +51,7 @@ function entity_version_update_8101(&$sandbox): TranslatableMarkup {
   ];
 
   $change_list = $update_manager->getChangeList();
-  if (!isset($change_list['entity_version_settings']) || !isset($change_list['entity_version_settings']['entity_type']) || $change_list['entity_version_settings']['entity_type'] !== EntityDefinitionUpdateManager::DEFINITION_CREATED) {
+  if (!isset($change_list['entity_version_settings']['entity_type']) || $change_list['entity_version_settings']['entity_type'] !== EntityDefinitionUpdateManager::DEFINITION_CREATED) {
     return t('The entity version settings entity type did not have to be installed.');
   }
 
