@@ -1,4 +1,13 @@
-# Change Log
+# Changelog
+
+## [8.x-1.0-beta6](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta6) (2020-12-03)
+
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta5...8.x-1.0-beta6)
+
+**Merged pull requests:**
+
+- EWPP-564: Install entity version settings entity type. [\#40](https://github.com/openeuropa/entity_version/pull/40) ([sergepavle](https://github.com/sergepavle))
+- EWPP-516: Update docker images. [\#39](https://github.com/openeuropa/entity_version/pull/39) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [8.x-1.0-beta5](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta5) (2020-10-09)
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta4...8.x-1.0-beta5)
