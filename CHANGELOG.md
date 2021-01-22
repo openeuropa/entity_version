@@ -1,22 +1,34 @@
 # Changelog
 
+## [8.x-1.0-beta7](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta7) (2021-01-22)
+
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta6...8.x-1.0-beta7)
+
+**Merged pull requests:**
+
+- EWPP-529: Replace scaffold library. [\#42](https://github.com/openeuropa/entity_version/pull/42) ([sergepavle](https://github.com/sergepavle))
+
 ## [8.x-1.0-beta6](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta6) (2020-12-03)
 
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta5...8.x-1.0-beta6)
 
 **Merged pull requests:**
 
+- Release-1.0-beta6: Update changelog. [\#41](https://github.com/openeuropa/entity_version/pull/41) ([nagyad](https://github.com/nagyad))
 - EWPP-564: Install entity version settings entity type. [\#40](https://github.com/openeuropa/entity_version/pull/40) ([sergepavle](https://github.com/sergepavle))
 - EWPP-516: Update docker images. [\#39](https://github.com/openeuropa/entity_version/pull/39) ([22Alexandra](https://github.com/22Alexandra))
 
 ## [8.x-1.0-beta5](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta5) (2020-10-09)
+
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta4...8.x-1.0-beta5)
 
 **Merged pull requests:**
 
+- EWPP-0000: Prepare release 1.0-beta5. [\#38](https://github.com/openeuropa/entity_version/pull/38) ([brummbar](https://github.com/brummbar))
 - EWPP-000: Updating .info file. [\#37](https://github.com/openeuropa/entity_version/pull/37) ([upchuk](https://github.com/upchuk))
 
 ## [8.x-1.0-beta4](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta4) (2020-10-01)
+
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta3...8.x-1.0-beta4)
 
 **Merged pull requests:**
