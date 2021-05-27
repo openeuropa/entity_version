@@ -28,6 +28,11 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * A user with administrative permissions.
    *
    * @var \Drupal\user\UserInterface
@@ -104,8 +109,8 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
     ];
     foreach ($select_boxes as $index => $select_box) {
       $this->assertFalse($selects[$index]->isVisible());
-      $this->assertEqual($selects[$index]->getAttribute('name'), $select_box['name']);
-      $this->assertEqual($selects[$index]->getAttribute('disabled'), $select_box['disabled']);
+      $this->assertEquals($selects[$index]->getAttribute('name'), $select_box['name']);
+      $this->assertEquals($selects[$index]->getAttribute('disabled'), $select_box['disabled']);
     }
     $select = end($selects);
     $this->assertEquals('node_second_bundle', $select->getAttribute('name'));
@@ -229,7 +234,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
     });
     sort($options);
     sort($expected_options);
-    $this->assertIdentical($options, $expected_options);
+    $this->assertSame($options, $expected_options);
   }
 
 }

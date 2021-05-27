@@ -91,7 +91,8 @@ class EntityVersionWorkflowManager {
     // Compute the transition being used in order to get the version actions
     // from its config. For this, we need to load the latest revision of the
     // entity.
-    $revision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $revision = $storage->getLatestRevisionId($entity->id());
 
     // Retrieve the configured actions to perform for the version field numbers
     // from the transition.
@@ -153,7 +154,9 @@ class EntityVersionWorkflowManager {
     $field_blacklist = $event->getFieldBlacklist();
 
     // We consider the latest revision as original to compare with the entity.
-    $latestRevision = $this->moderationInfo->getLatestRevision($entity->getEntityTypeId(), $entity->id());
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $latestRevision = $storage->getLatestRevisionId($entity->id());
+
     // Remove the blacklisted fields from checking.
     $fields = array_diff($fields, $field_blacklist);
     foreach ($fields as $field) {

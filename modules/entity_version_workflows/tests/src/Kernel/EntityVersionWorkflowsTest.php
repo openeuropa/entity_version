@@ -84,7 +84,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Save to increase the patch number (stay in draft).
@@ -155,7 +155,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Save to increase the patch number (stay in draft).
@@ -182,18 +182,19 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $values = [
       'title' => 'Workflow node',
       'type' => 'entity_version_workflows_example',
-      'moderation_state' => 'draft',
     ];
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->nodeStorage->create($values);
+    $node->setNewRevision();
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Alter the node to increase the patch number (stay in draft).
     $node->set('title', 'New title');
+    $node->setNewRevision();
     $node->save();
     $this->assertEntityVersion($node, 0, 0, 1);
     $node->save();
