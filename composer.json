@@ -21,7 +21,7 @@
         "openeuropa/code-review": "~1.6",
         "openeuropa/drupal-core-require-dev": "^8.9 || ^9",
         "openeuropa/task-runner-drupal-project-symlink": "^1.0",
-        "phpunit/phpunit": "^7 || ^8"
+        "phpspec/prophecy-phpunit": "^1 || ^2"
     },
     "_readme": [
         "We explicitly require symfony/browser-kit to allow phpunit tests after 'composer update --prefer-lowest' to complete successfully."
