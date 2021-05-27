@@ -12,6 +12,7 @@
     "require-dev": {
         "composer/installers": "^1.11",
         "drupal/core-composer-scaffold": "^8.9 || ^9",
+        "drupal/config_devel": "~1.2",
         "drupal/drupal-extension": "~4.0",
         "drush/drush": "^10.3",
         "drupal/upgrade_status": "^3.4",
