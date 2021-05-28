@@ -100,7 +100,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
-    $this->assertContains('<div>0.0.0</div>', (string) $output);
+    $this->assertStringContainsString('<div>0.0.0</div>', (string) $output);
 
     // Change the minimum version number category to minor.
     $this->displayOptions['settings']['minimum_category'] = 'minor';
@@ -109,7 +109,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
-    $this->assertContains('<div>0.0</div>', (string) $output);
+    $this->assertStringContainsString('<div>0.0</div>', (string) $output);
 
     // Change the minimum version number category to major.
     $this->displayOptions['settings']['minimum_category'] = 'major';
@@ -117,7 +117,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
     $this->verbose($output);
-    $this->assertContains('<div>0</div>', (string) $output);
+    $this->assertStringContainsString('<div>0</div>', (string) $output);
   }
 
 }

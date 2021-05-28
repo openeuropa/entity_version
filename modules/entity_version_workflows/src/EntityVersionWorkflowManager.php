@@ -91,8 +91,10 @@ class EntityVersionWorkflowManager {
     // Compute the transition being used in order to get the version actions
     // from its config. For this, we need to load the latest revision of the
     // entity.
+    /* @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $revision = $storage->getLatestRevisionId($entity->id());
+    $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+    $revision = $storage->loadRevision($latest_revision_id);
 
     // Retrieve the configured actions to perform for the version field numbers
     // from the transition.
@@ -154,8 +156,10 @@ class EntityVersionWorkflowManager {
     $field_blacklist = $event->getFieldBlacklist();
 
     // We consider the latest revision as original to compare with the entity.
+    /* @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $latestRevision = $storage->getLatestRevisionId($entity->id());
+    $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+    $latestRevision = $storage->loadRevision($latest_revision_id);
 
     // Remove the blacklisted fields from checking.
     $fields = array_diff($fields, $field_blacklist);

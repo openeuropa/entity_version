@@ -132,8 +132,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
 
     $page->pressButton('Save configuration');
 
-    $status_message = $assert_session->waitForElement('css', '.messages--status');
-    $this->assertEquals('Status message The Entity version configuration has been saved.', $status_message->getText());
+    $this->assertSession()->pageTextContains('Status message The Entity version configuration has been saved.');
 
     // Check that there are only 3 config entities created.
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
