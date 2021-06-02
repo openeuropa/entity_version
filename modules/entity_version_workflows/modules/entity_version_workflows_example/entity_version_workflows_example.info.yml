@@ -1,5 +1,5 @@
-name: Entity Version Workflows Example
-description: Example module to test the entity version content workflow functionalities.
+name: 'Entity Version Workflows Example'
+description: 'Example module to test the entity version content workflow functionalities.'
 type: module
 core_version_requirement: ^8 || ^9
 

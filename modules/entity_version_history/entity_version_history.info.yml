@@ -1,5 +1,5 @@
-name: Entity version history
-description: Entity version history provides a tab where version history of the entity is visualised in a table format.
+name: 'Entity version history'
+description: 'Entity version history provides a tab where version history of the entity is visualised in a table format.'
 type: module
 core_version_requirement: ^8 || ^9
 
