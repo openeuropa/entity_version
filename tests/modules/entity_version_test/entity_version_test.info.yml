@@ -1,5 +1,5 @@
-name: Entity Version Test
-description: Test module to test the entity version functionalities.
+name: 'Entity Version Test'
+description: 'Test module to test the entity version functionalities.'
 type: module
 core_version_requirement: ^8 || ^9
 
