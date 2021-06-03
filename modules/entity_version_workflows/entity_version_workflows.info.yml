@@ -1,5 +1,5 @@
-name: 'Entity version workflows'
-description: 'Entity version workflow allows to configure and control version numbers through workflow state transitions.'
+name: Entity version workflows
+description: Entity version workflow allows to configure and control version numbers through workflow state transitions.
 type: module
 core_version_requirement: ^8 || ^9
 
