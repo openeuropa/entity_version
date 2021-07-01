@@ -40,6 +40,11 @@ class HistoryOverviewTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -147,14 +152,14 @@ class HistoryOverviewTest extends WebDriverTestBase {
       $revision_id = $version_number + 1;
 
       // Check that the version number is there.
-      $this->assertContains($version_number . '.' . $version_number . '.' . $version_number, $row_html);
+      $this->assertStringContainsString($version_number . '.' . $version_number . '.' . $version_number, $row_html);
 
       // Check for the date.
-      $this->assertContains($date_formatter->format($revisions[$revision_id]->get('revision_timestamp')->value, 'short'), $row_html);
+      $this->assertStringContainsString($date_formatter->format($revisions[$revision_id]->get('revision_timestamp')->value, 'short'), $row_html);
 
       // Original author, and editor names should appear.
       $user = $revisions[$revision_id]->revision_uid->entity;
-      $this->assertContains($user->getAccountName(), $row_html);
+      $this->assertStringContainsString($user->getAccountName(), $row_html);
 
       // Check for the correct titles with the correct links.
       switch ($version_number) {
@@ -162,22 +167,22 @@ class HistoryOverviewTest extends WebDriverTestBase {
           // The latest and default revision link goes to the node. And since
           // there are two revisions with the same version, the latest one is
           // shown.
-          $this->assertContains('node/' . $node->id(), $row_html);
-          $this->assertContains('Updated without version change', $row_html);
+          $this->assertStringContainsString('node/' . $node->id(), $row_html);
+          $this->assertStringContainsString('Updated without version change', $row_html);
           $this->assertSession()->pageTextNotContains('My test node 5');
           break;
 
         case 0:
           // The original node did not have the version number in it's title.
-          $this->assertContains('My test node', $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
+          $this->assertStringContainsString('My test node', $row_html);
+          $this->assertStringContainsString('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
           break;
 
         default:
           // Revision titles contain the version number with a link to
           // the revision.
-          $this->assertContains('My test node ' . $version_number, $row_html);
-          $this->assertContains('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
+          $this->assertStringContainsString('My test node ' . $version_number, $row_html);
+          $this->assertStringContainsString('node/' . $node->id() . '/revisions/' . $revisions[$revision_id]->getRevisionId() . '/view', $row_html);
           break;
       }
     }

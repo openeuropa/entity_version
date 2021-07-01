@@ -29,6 +29,8 @@ services:
   # @link https://github.com/elgalu/docker-selenium/issues/20
   selenium:
     image: selenium/standalone-chrome-debug:3.141.59-oxygen
+    expose:
+      - '4444'
     environment:
       - DISPLAY=:99
       - SE_OPTS=-debug

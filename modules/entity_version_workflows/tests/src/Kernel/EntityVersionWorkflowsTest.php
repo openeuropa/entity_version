@@ -4,6 +4,7 @@ namespace Drupal\Tests\entity_version_workflows\Kernel;
 
 use Drupal\entity_version_workflows_example\EventSubscriber\TestCheckEntityChangedSubscriber;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\entity_version\Traits\EntityVersionAssertionsTrait;
 
 /**
@@ -24,7 +25,6 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'path',
     'field',
     'text',
     'node',
@@ -41,7 +41,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->installConfig([
@@ -58,13 +58,6 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('content_moderation_state');
 
-    // In Drupal 8.8, paths have been moved to an entity type.
-    // @todo remove this when the component will depend on 8.8.
-    if ($this->container->get('entity_type.manager')->hasDefinition('path_alias')) {
-      $this->container->get('module_installer')->install(['path_alias']);
-      $this->installEntitySchema('path_alias');
-    }
-
     $this->installSchema('node', 'node_access');
 
     $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -79,12 +72,12 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
       'type' => 'entity_version_workflows_example',
       'moderation_state' => 'draft',
     ];
-    /** @var \Drupal\node\NodeInterface $node */
-    $node = $this->nodeStorage->create($values);
+
+    $node = Node::create($values);
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Save to increase the patch number (stay in draft).
@@ -155,7 +148,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Save to increase the patch number (stay in draft).
@@ -182,14 +175,13 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $values = [
       'title' => 'Workflow node',
       'type' => 'entity_version_workflows_example',
-      'moderation_state' => 'draft',
     ];
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->nodeStorage->create($values);
     $node->save();
 
     // There is no default value so all versions should be 0.
-    $this->assertEqual('draft', $node->moderation_state->value);
+    $this->assertEquals('draft', $node->moderation_state->value);
     $this->assertEntityVersion($node, 0, 0, 0);
 
     // Alter the node to increase the patch number (stay in draft).
