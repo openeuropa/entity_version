@@ -41,7 +41,7 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->installConfig([
@@ -178,7 +178,6 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     ];
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->nodeStorage->create($values);
-    $node->setNewRevision();
     $node->save();
 
     // There is no default value so all versions should be 0.
@@ -187,7 +186,6 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
 
     // Alter the node to increase the patch number (stay in draft).
     $node->set('title', 'New title');
-    $node->setNewRevision();
     $node->save();
     $this->assertEntityVersion($node, 0, 0, 1);
     $node->save();
