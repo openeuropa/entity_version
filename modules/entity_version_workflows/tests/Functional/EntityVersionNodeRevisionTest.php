@@ -43,7 +43,7 @@ class EntityVersionNodeRevisionTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->adminUser = $this->drupalCreateUser([
@@ -87,7 +87,8 @@ class EntityVersionNodeRevisionTest extends BrowserTestBase {
 
     // Revert to the second revision and assert its version matches.
     $url = Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => 2]);
-    $this->drupalPostForm($url, [], 'Revert');
+    $this->drupalGet($url);
+    $this->submitForm([], 'Revert');
 
     $node_storage->resetCache();
     $node = $node_storage->load($node->id());
