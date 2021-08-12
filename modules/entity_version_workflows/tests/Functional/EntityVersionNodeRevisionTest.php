@@ -86,7 +86,10 @@ class EntityVersionNodeRevisionTest extends BrowserTestBase {
     $this->assertCount(3, $node_storage->revisionIds($node));
 
     // Revert to the second revision and assert its version matches.
-    $url = Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => 2]);
+    $url = Url::fromRoute('node.revision_revert_confirm', [
+      'node' => $node->id(),
+      'node_revision' => 2,
+    ]);
     $this->drupalGet($url);
     $this->submitForm([], 'Revert');
 

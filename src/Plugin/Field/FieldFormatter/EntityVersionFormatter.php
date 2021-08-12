@@ -101,7 +101,7 @@ class EntityVersionFormatter extends FormatterBase {
 
       $text_value[] = $value;
       if ($category === $minimum_category) {
-        $text_value = implode('.', $text_value);;
+        $text_value = implode('.', $text_value);
         break;
       }
     }
