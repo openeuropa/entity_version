@@ -9,7 +9,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangesDetectionTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\entity_version_workflows\Event\CheckEntityChangedEvent;
-use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -91,7 +90,7 @@ class EntityVersionWorkflowManager {
     // Compute the transition being used in order to get the version actions
     // from its config. For this, we need to load the latest revision of the
     // entity.
-    /* @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $latest_revision_id = $storage->getLatestRevisionId($entity->id());
     $revision = $storage->loadRevision($latest_revision_id);
@@ -106,7 +105,7 @@ class EntityVersionWorkflowManager {
       /** @var \Drupal\workflows\TransitionInterface $transition */
       $transition = $workflow_plugin->getTransitionFromStateToState($current_state, $next_state);
     }
-    catch (InvalidArgumentException $e) {
+    catch (\InvalidArgumentException $e) {
       return;
     }
 
@@ -156,7 +155,7 @@ class EntityVersionWorkflowManager {
     $field_blacklist = $event->getFieldBlacklist();
 
     // We consider the latest revision as original to compare with the entity.
-    /* @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $latest_revision_id = $storage->getLatestRevisionId($entity->id());
     $latestRevision = $storage->loadRevision($latest_revision_id);

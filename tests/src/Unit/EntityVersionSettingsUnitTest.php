@@ -101,7 +101,10 @@ class EntityVersionSettingsUnitTest extends UnitTestCase {
     $target_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
     $target_entity_type->expects($this->any())
       ->method('getBundleConfigDependency')
-      ->will($this->returnValue(['type' => 'config', 'name' => 'test.test_entity_type.id']));
+      ->will($this->returnValue([
+        'type' => 'config',
+        'name' => 'test.test_entity_type.id',
+      ]));
 
     $this->entityTypeManager->expects($this->any())
       ->method('getDefinition')
