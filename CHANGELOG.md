@@ -1,8 +1,8 @@
 # Changelog
 
-## [8.x-1.0-beta7](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta7) (2022-02-07)
+## [8.x-1.0-beta8](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta8) (2022-02-07)
 
-[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta7...8.x-1.0-beta7)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta7...8.x-1.0-beta8)
 
 **Merged pull requests:**
 
