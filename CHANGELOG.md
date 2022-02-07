@@ -1,11 +1,21 @@
-# Change Log
+# Changelog
 
-## [8.x-1.0-beta7](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta7) (2021-08-12)
+## [8.x-1.0-beta7](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta7) (2022-02-07)
+
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta7...8.x-1.0-beta7)
+
+**Merged pull requests:**
+
+- EWPP-1912: Update to PHP8 and Composer v2. [\#48](https://github.com/openeuropa/entity_version/pull/48) ([22Alexandra](https://github.com/22Alexandra))
+
+## [8.x-1.0-beta7](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta7) (2021-08-16)
+
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta6...8.x-1.0-beta7)
 
 **Merged pull requests:**
 
 - EWPP-0000: Fix grumphp issues. [\#47](https://github.com/openeuropa/entity_version/pull/47) ([22Alexandra](https://github.com/22Alexandra))
+- Prepare changelog for release 8.x-1.0-beta7. [\#46](https://github.com/openeuropa/entity_version/pull/46) ([brummbar](https://github.com/brummbar))
 - OEL-76: Drupal 9 compatibility fixes. [\#45](https://github.com/openeuropa/entity_version/pull/45) ([saidatom](https://github.com/saidatom))
 - EWPP-721: Update xdebug configuration. [\#44](https://github.com/openeuropa/entity_version/pull/44) ([22Alexandra](https://github.com/22Alexandra))
 - EWPP-529: Replace scaffold library. [\#42](https://github.com/openeuropa/entity_version/pull/42) ([sergepavle](https://github.com/sergepavle))
@@ -80,7 +90,7 @@
 
 ## [0.1.0](https://github.com/openeuropa/entity_version/tree/0.1.0) (2019-06-27)
 
-[Full Changelog](https://github.com/openeuropa/entity_version/compare/7a2d6e675ca3c6886e02f168111e7016ebd963dd...0.1.0)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8f346f379f47002adf3eba7e6c1d2ecbbcaab374...0.1.0)
 
 **Merged pull requests:**
 
