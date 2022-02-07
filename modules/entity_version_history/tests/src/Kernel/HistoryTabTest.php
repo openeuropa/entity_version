@@ -159,13 +159,13 @@ class HistoryTabTest extends KernelTestBase {
     $this->assertTrue($access_result->isForbidden());
     $this->assertEquals('Insufficient permissions to access the entity version history page.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
-    $this->assertEquals($cache_tags, $access_result->getCacheTags());
+    $this->assertEqualsCanonicalizing($cache_tags, $access_result->getCacheTags());
 
     // A user with permissions can access the history page.
     $access_result = $access_manager->checkNamedRoute('entity.node.entity_version_history', ['node' => $node->id()], $user_with_permission, TRUE);
     $this->assertTrue($access_result->isAllowed());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
-    $this->assertEquals($cache_tags, $access_result->getCacheTags());
+    $this->assertEqualsCanonicalizing($cache_tags, $access_result->getCacheTags());
 
     // Remove the corresponding history config.
     $entity_type_manager
@@ -188,7 +188,7 @@ class HistoryTabTest extends KernelTestBase {
     $this->assertTrue($access_result->isForbidden());
     $this->assertEquals('No version settings found for this entity type and bundle.', $access_result->getReason());
     $this->assertEquals($cache_contexts, $access_result->getCacheContexts());
-    $this->assertEquals($cache_tags, $access_result->getCacheTags());
+    $this->assertEqualsCanonicalizing($cache_tags, $access_result->getCacheTags());
   }
 
 }
