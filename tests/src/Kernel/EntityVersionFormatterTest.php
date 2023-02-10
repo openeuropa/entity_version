@@ -61,7 +61,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
-    $this->installSchema('system', ['sequences', 'key_value']);
+    $this->installSchema('system', ['sequences']);
 
     // Create a generic field for validation.
     $this->fieldStorage = FieldStorageConfig::create([
