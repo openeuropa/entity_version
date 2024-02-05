@@ -2,4 +2,4 @@ name: Entity version
 description: Provides a way to store and keep track of the version of entities.
 
 type: module
-core_version_requirement: ^9.4 || ^10
+core_version_requirement: ^10
