@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -80,10 +81,12 @@ class EntityVersionSettingsStorage extends ConfigEntityStorage {
   protected function doPostSave(EntityInterface $entity, $update) {
     parent::doPostSave($entity, $update);
 
-    // We need to invalidate cache because in our route subscriber and our
-    // entity type alter we are depending on these config entities.
-    $this->entityTypeManager->clearCachedDefinitions();
-    $this->routeBuilder->rebuild();
+    if (!InstallerKernel::installationAttempted()) {
+      // We need to invalidate cache because in our route subscriber and our
+      // entity type alter we are depending on these config entities.
+      $this->entityTypeManager->clearCachedDefinitions();
+      $this->routeBuilder->rebuild();
+    }
   }
 
 }
