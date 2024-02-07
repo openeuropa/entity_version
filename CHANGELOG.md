@@ -1,17 +1,30 @@
 # Changelog
 
+## [release-8.x-1.3](https://github.com/openeuropa/entity_version/tree/release-8.x-1.3) (2024-02-07)
+
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.2...release-8.x-1.3)
+
+**Merged pull requests:**
+
+- EWPP-3974: Update test matrix and supported core version. [\#58](https://github.com/openeuropa/entity_version/pull/58) ([brummbar](https://github.com/brummbar))
+- EWPP-3976: Avoid router rebuild during site install. [\#57](https://github.com/openeuropa/entity_version/pull/57) ([hernani](https://github.com/hernani))
+
 ## [8.x-1.2](https://github.com/openeuropa/entity_version/tree/8.x-1.2) (2023-02-22)
+
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.1...8.x-1.2)
 
 **Merged pull requests:**
 
+- Prepare changelog for release 1.2. [\#56](https://github.com/openeuropa/entity_version/pull/56) ([brummbar](https://github.com/brummbar))
 - EWPP-2990: Drupal 10 compatibility. [\#55](https://github.com/openeuropa/entity_version/pull/55) ([brummbar](https://github.com/brummbar))
 
 ## [8.x-1.1](https://github.com/openeuropa/entity_version/tree/8.x-1.1) (2022-11-04)
+
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0...8.x-1.1)
 
 **Merged pull requests:**
 
+- Prepare release 8.x-1.1. [\#54](https://github.com/openeuropa/entity_version/pull/54) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2619: Flag for using loaded revision to calculate current-next state in version transition. [\#53](https://github.com/openeuropa/entity_version/pull/53) ([upchuk](https://github.com/upchuk))
 
 ## [8.x-1.0](https://github.com/openeuropa/entity_version/tree/8.x-1.0) (2022-08-02)
