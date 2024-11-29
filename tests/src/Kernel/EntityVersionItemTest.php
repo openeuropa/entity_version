@@ -2,11 +2,11 @@
 
 namespace Drupal\Tests\entity_version\Kernel;
 
+use Drupal\Tests\entity_version\Traits\EntityVersionAssertionsTrait;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\entity_version\Traits\EntityVersionAssertionsTrait;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
  * Tests the new entity API for the entity version field type.

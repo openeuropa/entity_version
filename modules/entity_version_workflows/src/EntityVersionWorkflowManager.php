@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\entity_version_workflows;
 
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangesDetectionTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\entity_version_workflows\Event\CheckEntityChangedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

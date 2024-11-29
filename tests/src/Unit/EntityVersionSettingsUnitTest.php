@@ -1,14 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\entity_version\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Tests\UnitTestCase;
 use Drupal\entity_version\Entity\EntityVersionSettings;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\UnitTestCase;
 
 /**
  * Test EntityVersionSettingsForm entity class.

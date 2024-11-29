@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\entity_version\FunctionalJavascript;
 
@@ -187,6 +187,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
 
     // Check the configs are deleted. Only 1 should be left.
     $this->container->get('config.factory')->clearStaticCache();
+    $storage->resetCache();
     $config_entities = $storage->loadMultiple();
     $this->assertCount(1, $config_entities);
 
@@ -200,6 +201,7 @@ class EntityVersionSettingsTest extends WebDriverTestBase {
 
     // Check the config is updated correctly.
     $this->container->get('config.factory')->clearStaticCache();
+    $storage->resetCache();
     $config_entities = $storage->loadMultiple();
     $this->assertCount(1, $config_entities);
     $config = $this->config('entity_version.settings.node.second_bundle');

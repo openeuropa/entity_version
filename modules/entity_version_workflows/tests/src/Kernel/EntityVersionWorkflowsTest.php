@@ -2,10 +2,10 @@
 
 namespace Drupal\Tests\entity_version_workflows\Kernel;
 
-use Drupal\entity_version_workflows_example\EventSubscriber\TestCheckEntityChangedSubscriber;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\node\Entity\Node;
 use Drupal\Tests\entity_version\Traits\EntityVersionAssertionsTrait;
+use Drupal\entity_version_workflows_example\EventSubscriber\TestCheckEntityChangedSubscriber;
+use Drupal\node\Entity\Node;
 
 /**
  * Test the entity version numbers with workflow transitions.

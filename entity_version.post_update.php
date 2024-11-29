@@ -5,7 +5,7 @@
  * Entity version post updates.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Migrate to configuration-based version field settings.
