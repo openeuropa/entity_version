@@ -1,3 +1,7 @@
+# :warning: This repository is archived
+
+Development has moved to [drupal.org](https://www.drupal.org/project/entity_version).
+
 # Entity version
 
 The Entity Version module attaches a version number to content entities that helps content editors to understand the evolution of the content item.\
